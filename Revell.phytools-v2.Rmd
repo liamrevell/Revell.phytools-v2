@@ -426,29 +426,93 @@ plot(density(cordylid.mcmc,what=49),las=1,bty="n",
 
 ## Multivariate trait evolution
 
+*phytools* contains several multivariate trait evolution models. One of these is a model (described in Revell and Collar, 2009; Revell et al., 2022) in which the rates and evolutionary correlation between traits is allowed to vary as a function of a set of mapped regimes on the phylogeny.
+
+To illustrate this method, we'll use a phylogeny and dataset of tropidurid lizard species from Revell et al. (2022).
+
+```{r}
+data(tropidurid.tree)
+data(tropidurid.data)
+```
+
+In this case, our phylogeny is *already* a tree with mapped regimes. We can see this by merely printing the model object that we loaded.
+
+```{r}
+tropidurid.tree
+```
+
+This tells us that our phylogenetic tree contains 76 taxa and a mapped regime with two states: `"n_rock"` (non-rock dwelling) and `"rock"` (rock-dwelling). Since *phytools* permits mapped regimes to have arbitrary names, let's rename these levels in a more informative way.
+
+```{r}
+tropidurid.tree<-mergeMappedStates(tropidurid.tree,"n_rock","non-rock dwelling")
+tropidurid.tree<-mergeMappedStates(tropidurid.tree,"rock","rock-dwelling")
+```
+
+Let's plot this tree.
+
+```{r trop-tree, fig.cap="Phylogenetic tree of tropidurid lizard species from Revell et al. (2022)."}
+cols<-setNames(c("white","black"),c("non-rock dwelling","rock-dwelling"))
+plot(tropidurid.tree,colors=cols,direction="upwards",outline=TRUE,lwd=3,
+  fsize=0.5,ftype="i",offset=1)
+legend("bottomright",c("non-rock dwelling","rock-dwelling"),pch=22,pt.bg=cols,
+  cex=0.8,pt.cex=1.2)
+```
+
+Our data consist of a single measure of overall body size (as trait 1), and a second metric trait measuring dorsoventral flattening. Our hypothesis is that these two traits should scale together in non-rock dwelling lizard species: bigger lizards also tend to be deeper. However, we would like to ask if this general relationship is uncoupled in rock-dwelling species in which the force of selection favors *increased* flattening relative to their non-rock kin.
+
+To test this, we'll use the *phytools* function `evolvcv.lite` which fits a heirarchical set of models for the evolutionary rates (of each character) and evolutionary correlation (between them).
+
+```{r}
+tropidurid.fits<-evolvcv.lite(tropidurid.tree,tropidurid.data)
+```
+```{r}
+anova(tropidurid.fits)
+```
+
+Model comparison indicates that `"model 3"` is the best-supported for our data. Indeed, this model is one in which the evolutionary covariance between overall body size and dorsoventral flattening is *negative* among rock-dwelling lineages -- compared to the positive evolutionary covariance in non-rock species and across all other models.
+
+```{r}
+tropidurid.fits
+```
+
 ## Variable rate Brownian motion
 
-```{r}
-data(mammal.tree)
-data(mammal.data)
+Lastly, *phytools* recently added a function to fit a variable-rate Brownian model using penalized likelihood.
+
+Under this model, the rate of phenotypic trait evolution ($\sigma$^{2} under a Brownian evolutionary process) is permitted to vary from edge to edge in the tree to a degree controlled by our $\lambda$ shrinkage or smoothing parameter (Revell, 2021). This method has already been used to, for example, investigate rate heterogeneity differences in body size evolution between cetaceans and plesiosaurs (Sander et al., 2021).
+
+Here, I'll 
+
+```{r, echo=FALSE}
+primate.tree<-read.tree(file="http://www.phytools.org/Rbook/3/primateEyes.phy")
+primate.data<-read.csv(file="http://www.phytools.org/Rbook/3/primateEyes.csv",row.names=1)
+```
+```{r, eval=FALSE}
+data(primate.tree)
+data(primate.data)
 ```
 
 ```{r}
-mammal.lnMass<-setNames(log(mammal.data$bodyMass),rownames(mammal.data))
+primate.lnSkull<-setNames(log(primate.data$Skull_length),rownames(primate.data))
 ```
 
 ```{r}
-mammal.multirateBM<-multirateBM(mammal.tree,mammal.lnMass,lamba=1,
+primate.multirateBM<-multirateBM(primate.tree,primate.lnSkull,lamba=1,
   parallel=TRUE)
 ```
 
 ```{r fig14, fig.cap="Estimated rates of log(body mass) evolution under a variable-rate Brownian evolution model."}
-plot(mammal.multirateBM,fsize=0.6,lwd=4,outline=TRUE,ftype="i")
+plot(primate.multirateBM,fsize=0.4,lwd=3,outline=FALSE,ftype="i")
 ```
 
 # Diversification
 
+In addition to the methods that we've seen so far, *phytools* also contains a handful of different techniques for investigating diversification.
+
+## Speciation and extinction models
+
 # Visualization
+
 
 
 
