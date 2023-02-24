@@ -370,50 +370,61 @@ anole.Pagel_lambda
 
 Unsurprisingly, this tells us that we've found significant phylogenetic signal in our trait by both measures!
 
+*phytools* also contains methods to visualize our phylogenetic signal analyses. In particular, for Blomberg et al.'s *K* we can plot the permutation distribution of *K* as well as our observed measure; whereas for Pagel's $\lambda$ we can plot the likelihood surface and our measure solution. Both of these plots are illustrated in Figure \@ref{phylosig} for our *Anolis* body size data.
+
 ```{r phylosig, fig.cap="a) Blomberg et al. (2003) measured value of the *K* statistic for phylogenetic signal, compared to a null distribution of *K* obtained via randomization. b) Pagel's (1999) $\\lambda$ statistic for phylogenetic signal, also showing the likelihood surface."}
-par(mfrow=c(1,2))
-plot(anole.Blomberg_K,las=1,cex.axis=0.8,
-  cex.lab=0.9)
+par(mfrow=c(1,2),cex=0.9)
+plot(anole.Blomberg_K,las=1,cex.axis=0.9)
 mtext("a)",adj=0,line=1)
-plot(anole.Pagel_lambda,bty="n",las=1,cex.lab=0.9,
-  cex.axis=0.8,xlim=c(0,1.1))
+plot(anole.Pagel_lambda,bty="n",las=1,
+  cex.axis=0.9,xlim=c(0,1.1))
 mtext("b)",adj=0,line=1)
 ```
 
 ## Bayesian ancestral state estimation
 
-```{r}
-data(vertebrate.tree)
-data(vertebrate.data)
+*phytools* contains multiple functions for discrete and continuous character ancestral state estimation. One such method is the function `anc.Bayes` which, as its name would suggest, performs ancestral state estimation using Bayesian MCMC. The implementation of this method allows us to include prior information about the states at internal nodes.
+
+To illustrate `anc.Bayes` I'll load a *phytools* dataset consisting of a phylogeny of cordylid lizards. 
+
+```{r, echo=FALSE}
+cordylid.tree<-read.tree(file="http://www.phytools.org/Rbook/5/cordylid-tree.phy")
+cordylid.data<-read.csv(file="http://www.phytools.org/Rbook/5/cordylid-data.csv",
+  row.names=1)
+```
+```{r, eval=FALSE}
+data(cordylid.tree)
+data(cordylid.data)
 ```
 
 ```{r}
-vertebrate.logMass<-setNames(log(vertebrate.data$Mass),rownames(vertebrate.data))
-vertebrate.logMass
+cordylid.pc1<-setNames(cordylid.data$pPC1,rownames(cordylid.data))
 ```
 
 ```{r}
-vertebrate.mcmc<-anc.Bayes(vertebrate.tree,vertebrate.logMass,
+cordylid.mcmc<-anc.Bayes(cordylid.tree,cordylid.pc1,
   ngen=100000)
 ```
 
 ```{r}
-vertebrate.ace<-summary(vertebrate.mcmc)
+cordylid.ace<-summary(cordylid.mcmc)
 ```
 
 
-```{r fig12, fig.cap="Reconstructed ancestral values from Bayesian MCMC projected onto the nodes and edges of the tree."}
-plot(setMap(contMap(vertebrate.tree,vertebrate.logMass,
-  anc.states=vertebrate.ace,plot=FALSE),
+```{r cordylid-ace, fig.cap="Reconstructed ancestral values from Bayesian MCMC projected onto the nodes and edges of the tree."}
+plot(setMap(contMap(cordylid.tree,cordylid.pc1,
+  anc.states=cordylid.ace,plot=FALSE),
   viridisLite::viridis(n=10)),ftype="i",
-  leg.txt="log(body mass)",fsize=c(1,0.8))
-nodelabels(frame="circle",bg="white",cex=0.8)
+  leg.txt="PC 1",fsize=c(0.7,0.8))
+nodelabels(frame="circle",bg="white",cex=0.7)
 ```
 
-```{r fig13, fig.cap="Posterior probability density of the values at the root node of the tree in Figure 12."}
-plot(density(vertebrate.mcmc,node=12),las=1,bty="n",
+```{r cordylid-pd, fig.cap="Posterior probability density at node 49 of Figure  10from Bayesian MCMC ancestral state reconstruction of PC 1 from a morphological analysis on a phylogenetic tree of cordylid lizards."}
+plot(density(cordylid.mcmc,what=49),las=1,bty="n",
   main="",cex.lab=0.9,cex.axis=0.8)
 ```
+
+## Multivariate trait evolution
 
 ## Variable rate Brownian motion
 
