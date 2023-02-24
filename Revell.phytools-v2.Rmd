@@ -171,7 +171,7 @@ mtext("b) transitions to non-piscivory",line=1,
   adj=0,cex=0.9)
 ```
 
-The distributions of Figure \@ref{fig:num-changes} show the relative frequencies of changes of each type across our set of mapped histories, as well as Bayesian 95\% high probability density intervals from *coda*. An interesting attribute of these posterior distributions is that they are both *bi-modal*. This is due in part to our procedure of model-averaging in which we sampled both reversible and *irreversible* character evolution models in proportion to their weights. (The weight of evidence was highly similar between our equal-rates model and the irreversible model in which piscivory is acquired from piscivory, but never the reverse.)
+The distributions of Figure \@ref(fig:num-changes) show the relative frequencies of changes of each type across our set of mapped histories, as well as Bayesian 95\% high probability density intervals from *coda*. An interesting attribute of these posterior distributions is that they are both *bi-modal*. This is due in part to our procedure of model-averaging in which we sampled both reversible and *irreversible* character evolution models in proportion to their weights. (The weight of evidence was highly similar between our equal-rates model and the irreversible model in which piscivory is acquired from piscivory, but never the reverse.)
 
 Lastly, in addition to these analyses, *phytools* also makes it easy to visualize the posterior probabilities of each of the two trait conditions not only at nodes, but also also along the branches of the phylogeny. This can be done using the function `densityMap` (Revell, 2013), which creates a graph showing the probability *density* of stochastic history in each of our mapped states. By design, in *phytools* this object can be first created, using the `densityMap` function, updated, using the function `setMap` to adjust the color palette for plotting, and then graphed, using a generic plot method designed for the object class.
 
@@ -195,7 +195,7 @@ plot(sunfish.densityMap,lwd=3,outline=TRUE,fsize=0.7,
 
 ## The polymorphic trait evolution model
 
-Another important, but much more recently-added, tool in the *phytools* R package is a method (denominated `fitpolyMk`) designed to fit a discrete character evolution model to trait data containing intraspecific polymorphism. In this case, the model is one in which an evolutionary transition from (say) character state *a* to character state *b* must first pass through the intermediate polymorphic condition of *a* + *b*. This model becomes increasingly complicated for multi-state data in which we must also consider whether our characters are evolving in an ordered or unordered fashion. Figure \@ref{fig:structure-polyMk} shows the general structure of an *ordered* polymorphic trait evolution model (in panel a) and an *unordered* model (in panel b), both for the same number of monomorphic conditions of our trait.
+Another important, but much more recently-added, tool in the *phytools* R package is a method (denominated `fitpolyMk`) designed to fit a discrete character evolution model to trait data containing intraspecific polymorphism. In this case, the model is one in which an evolutionary transition from (say) character state *a* to character state *b* must first pass through the intermediate polymorphic condition of *a* + *b*. This model becomes increasingly complicated for multi-state data in which we must also consider whether our characters are evolving in an ordered or unordered fashion. Figure \@ref(fig:structure-polyMk) shows the general structure of an *ordered* polymorphic trait evolution model (in panel a) and an *unordered* model (in panel b), both for the same number of monomorphic conditions of our trait.
 
 ```{r structure-polyMk, fig.cap="Example structures of two alternative polymorphic trait evolution models for characters with four monomorphic conditions: a) an ordered model; b) an unordered model. See main text for additional details."}
 par(mfrow=c(1,2))
@@ -321,7 +321,7 @@ legend("topleft",names(hab.cols),pch=21,pt.bg=hab.cols,pt.cex=1.5,
   cex=0.8,bty="n")
 ```
 
-Lastly, let's graph the posterior distribution of the *accumulation* of lineages in each state over time, using the *phytools* function `ltt` as follows. We can do that using the same color palette as in Figure \@ref{fig:anc-fitpolyMk}.
+Lastly, let's graph the posterior distribution of the *accumulation* of lineages in each state over time, using the *phytools* function `ltt` as follows. We can do that using the same color palette as in Figure \@ref(fig:anc-fitpolyMk).
 
 ```{r ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps."}
 butterfly.ltt<-ltt(butterfly.simmap)
