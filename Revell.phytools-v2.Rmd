@@ -135,7 +135,7 @@ cols<-setNames(viridisLite::viridis(n=2),
   levels(feeding_mode))
 par(mfrow=c(2,3))
 plot(sample(sunfish.simmap,6),ftype="i",fsize=0.6,
-  colors=cols,outline=TRUE,offset=0.3)
+  colors=cols,offset=0.2)
 ```
 
 Although this already gives a sense of the uncertainty of our ancestral character history on the tree for our trait, most commonly we don't simply graph a subset (or all) of our stochastic mapped trees. Typically, instead, we first *summarize* our stochastic character maps (in multiple ways) before proceeding to plot or analyze these summarized results.
@@ -143,7 +143,7 @@ Although this already gives a sense of the uncertainty of our ancestral characte
 Perhaps most often, *phytools* users undertaking stochastic character mapping want to compute the posterior probabilities of each value of the character trait at each internal node of the tree. These values are calculated using the generic `summary` method for our object class, which can then be plotted using a generic `plot` function call as follows.
 
 ```{r posterior-probs, fig.cap="Posterior probabilities at each ancestral node of the centrarchid tree of Figure 1 from stochastic character mapping using model weights to sample across four different extended M*k* trait evolution models."}
-plot(summary(sunfish.simmap),ftype="i",fsize=0.8,
+plot(summary(sunfish.simmap),ftype="i",fsize=0.7,
   colors=cols)
 legend("topleft",levels(feeding_mode),pch=21,
   pt.cex=2,pt.bg=cols,bty="n")
@@ -189,7 +189,7 @@ load("sunfish.densityMap.rda")
 ```{r densityMap, echo=FALSE, fig.cap="Posterior probability density of each of the two character levels, piscivory and non-piscivory, mapped along the edges of a tree of centrarchid fishes. See main text for more details."}
 sunfish.densityMap<-setMap(sunfish.densityMap,
   viridisLite::viridis(n=10))
-plot(sunfish.densityMap,lwd=3,outline=TRUE,fsize=0.8,
+plot(sunfish.densityMap,lwd=3,outline=TRUE,fsize=0.7,
   legend=0.1)
 ```
 
@@ -202,7 +202,7 @@ par(mfrow=c(1,2))
 graph.polyMk(k=4,ordered=TRUE,states=0:3,mar=rep(0.1,4))
 mtext("a) ordered polymorphic model",line=-1,adj=0.2)
 graph.polyMk(k=4,ordered=FALSE,states=letters[1:4],
-  mar=rep(0.1,4))
+  mar=rep(0.1,4),spacer=0.15)
 mtext("b) unordered polymorphic model",line=-1,adj=0.2)
 ```
 
