@@ -142,11 +142,11 @@ Although this already gives a sense of the uncertainty of our ancestral characte
 
 Perhaps most often, *phytools* users undertaking stochastic character mapping want to compute the posterior probabilities of each value of the character trait at each internal node of the tree. These values are calculated using the generic `summary` method for our object class, which can then be plotted using a generic `plot` function call as follows.
 
-```{r posterior-probs, fig.cap="Posterior probabilities at each ancestral node of the centrarchid tree of Figure 1 from stochastic character mapping using model weights to sample across four different extended M*k* trait evolution models."}
+```{r posterior-probs, fig.cap="Posterior probabilities at each ancestral node of the centrarchid tree of Figure 1 from stochastic character mapping using model weights to sample across four different extended M*k* trait evolution models.",fig.height=3.5}
 plot(summary(sunfish.simmap),ftype="i",fsize=0.7,
-  colors=cols)
+  colors=cols,cex=c(0.6,0.3))
 legend("topleft",levels(feeding_mode),pch=21,
-  pt.cex=2,pt.bg=cols,bty="n")
+  pt.cex=1.5,pt.bg=cols,bty="n",cex=0.8)
 ```
 
 A correct interpretation of the graph of Figure \@ref(fig:posterior-probs) shows the observed discrete character states (at the tips of the tree) and the posterior probabilities from stochastic mapping that each internal node is in each state, in which transition models were sampled in proportion to the weight of evidence in support of each model.
@@ -157,7 +157,7 @@ To obtain this, we'll first call the generic function `density` which, when give
 
 To recreate this analysis completely, readers will also have to install an additional contributed R package called *coda* (Plummer et al., 2006) in the same way that we installed *phytools* earlier. If we have *coda* installed, it will be loaded automatically.
 
-```{r num-changes, fig.cap="Posterior probability distributions of changes either (a) from non-piscivory to piscivory, or (b) from piscivory to non-piscivory, obtained from an analysis of stochastic mapping. See main text for additional details."}
+```{r num-changes, fig.cap="Posterior probability distributions of changes either (a) from non-piscivory to piscivory, or (b) from piscivory to non-piscivory, obtained from an analysis of stochastic mapping. See main text for additional details.",fig.height=3.5}
 sunfish.density<-density(sunfish.simmap)
 par(mfrow=c(1,2),las=1,cex.axis=0.8,cex.lab=0.9)
 COLS<-setNames(cols,sunfish.density$trans)
@@ -197,7 +197,7 @@ plot(sunfish.densityMap,lwd=3,outline=TRUE,fsize=0.7,
 
 Another important, but much more recently-added, tool in the *phytools* R package is a method (denominated `fitpolyMk`) designed to fit a discrete character evolution model to trait data containing intraspecific polymorphism. In this case, the model is one in which an evolutionary transition from (say) character state *a* to character state *b* must first pass through the intermediate polymorphic condition of *a* + *b*. This model becomes increasingly complicated for multi-state data in which we must also consider whether our characters are evolving in an ordered or unordered fashion. Figure \@ref(fig:structure-polyMk) shows the general structure of an *ordered* polymorphic trait evolution model (in panel a) and an *unordered* model (in panel b), both for the same number of monomorphic conditions of our trait.
 
-```{r structure-polyMk, fig.cap="Example structures of two alternative polymorphic trait evolution models for characters with four monomorphic conditions: a) an ordered model; b) an unordered model. See main text for additional details."}
+```{r structure-polyMk, fig.cap="Example structures of two alternative polymorphic trait evolution models for characters with four monomorphic conditions: a) an ordered model; b) an unordered model. See main text for additional details.",fig.height=3.5}
 par(mfrow=c(1,2))
 graph.polyMk(k=4,ordered=TRUE,states=0:3,mar=rep(0.1,4))
 mtext("a) ordered polymorphic model",line=-1,adj=0.2)
@@ -288,7 +288,7 @@ butterfly.aov<-anova(butterfly.ER_ordered,butterfly.ER_unordered,
 
 Our model comparison shows that (among the models in our set) the best supported by far is the ordered, all-rates-different model. *phytools* has a function to graph this model, so let's proceed and do so.
 
-```{r ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies."}
+```{r ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies.",fig.height=3.5}
 plot(butterfly.ARD_ordered,asp=0.7,mar=rep(0.1,4))
 legend("bottomleft",legend=c(
   paste("log(L) =",round(logLik(butterfly.ARD_ordered),2)),
@@ -327,7 +327,7 @@ Figure \@ref(fig:anc-fitpolyMk) shows both the observed (at the tips) and recons
 
 Lastly, let's graph the posterior distribution of the *accumulation* of lineages in each state over time, using the *phytools* function `ltt` as follows. We can do that using the same color palette as in Figure \@ref(fig:anc-fitpolyMk). (This graph is only especially meaningful for the situation in which the taxa of our phylogeny have been completely sampled. This is unlikely to be true here, but it should be nonetheless interesting to see.)
 
-```{r ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps.",fig.height=3.5}
+```{r ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps.",fig.height=3.5 }
 butterfly.ltt<-ltt(butterfly.simmap)
 par(mar=c(5.1,4.1,1.1,1.1))
 plot(butterfly.ltt,show.total=FALSE,bty="n",las=1,cex.axis=0.8,
