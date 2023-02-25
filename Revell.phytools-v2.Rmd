@@ -157,8 +157,10 @@ To obtain this, we'll first call the generic function `density` which, when give
 
 To recreate this analysis completely, readers will also have to install an additional contributed R package called *coda* (Plummer et al., 2006) in the same way that we installed *phytools* earlier. If we have *coda* installed, it will be loaded automatically.
 
-```{r num-changes, fig.cap="Posterior probability distributions of changes either (a) from non-piscivory to piscivory, or (b) from piscivory to non-piscivory, obtained from an analysis of stochastic mapping. See main text for additional details.",fig.height=3.5}
+```{r}
 sunfish.density<-density(sunfish.simmap)
+```
+```{r num-changes, fig.cap="Posterior probability distributions of changes either (a) from non-piscivory to piscivory, or (b) from piscivory to non-piscivory, obtained from an analysis of stochastic mapping. See main text for additional details.",fig.height=3.5}
 par(mfrow=c(1,2),las=1,cex.axis=0.8,cex.lab=0.9)
 COLS<-setNames(cols,sunfish.density$trans)
 plot(sunfish.density,ylim=c(0,0.6),transition=names(COLS)[1],
@@ -265,10 +267,11 @@ Now we can proceed to do the same thing, but this time setting the argument `ord
 
 Here we should also specify the order level using the argument `order`. If `order` isn't indicated, `fitpolyMk` will simply assume that our characters are ordered alphanumerically -- but this is very rarely likely to be correct! (Readers may notice that it happens to be in this case. I set the argument `order` anyway!)
 
-```{r}
+```{r,echo=FALSE}
 levs<-c("forest","fringe","open")
 ```
 ```{r, eval=FALSE}
+levs<-c("forest","fringe","open")
 butterfly.ER_ordered<-fitpolyMk(butterfly.tree,butterfly.habitat,
   model="ER",ordered=TRUE,order=levs,quiet=TRUE)
 butterfly.ARD_ordered<-fitpolyMk(butterfly.tree,butterfly.habitat,
@@ -288,17 +291,23 @@ butterfly.aov<-anova(butterfly.ER_ordered,butterfly.ER_unordered,
 
 Our model comparison shows that (among the models in our set) the best supported by far is the ordered, all-rates-different model. *phytools* has a function to graph this model, so let's proceed and do so.
 
-```{r ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies.",fig.height=3.5}
-plot(butterfly.ARD_ordered,asp=0.7,mar=rep(0.1,4))
+```{r ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies.",fig.height=3}
+plot(butterfly.ARD_ordered,asp=0.65,mar=rep(0.1,4),
+  cex.traits=0.8)
 legend("bottomleft",legend=c(
   paste("log(L) =",round(logLik(butterfly.ARD_ordered),2)),
-  paste("AIC =",round(AIC(butterfly.ARD_ordered),2))),bty="n")
+  paste("AIC =",round(AIC(butterfly.ARD_ordered),2))),bty="n",
+  cex=0.9)
 ```
 
 Just as with our fitted M*k* models from the prior section, we can *also* pass this fitted model object our generic stochastic character mapping method, `simmap`. If we do, it will automatically generate a set of 100 stochastic character maps under our fitted model. (We could've likewise passed `simmap` our `anova` results, but in this case nearly all the weight of evidence fell on one model: our ordered, all-rates-different model.)
 
-```{r}
+```{r, eval=FALSE}
 butterfly.simmap<-simmap(butterfly.ARD_ordered)
+butterfly.simmap
+```
+```{r, echo=FALSE}
+load("butterfly.simmap.rda")
 butterfly.simmap
 ```
 
@@ -308,11 +317,11 @@ Let's compute a summary of this set of stochastically mapped character histories
 butterfly.summary<-summary(butterfly.simmap)
 ```
 
-JUst as we saw before, the object from our generic `summary` call can be plotted.
+Just as we saw before, the object from our generic `summary` call can be plotted pretty easily with *phytools*.
 
 Using the *base* graphics function `rgb`, I'll try to select colors for plotting that are evenly spaced in a red-green-blue color space in which the "corners" (red, green, and blue) correspond to the three monomorphic states of our data.
 
-```{r anc-fitpolyMk, fig.cap="Posterior probabilities of monomorphic or polymorphic conditions at internal nodes from stochastic mapping under an ordered, ARD model of trait evolution. See main text for additional details."}
+```{r anc-fitpolyMk, fig.cap="Posterior probabilities of monomorphic or polymorphic conditions at internal nodes from stochastic mapping under an ordered, ARD model of trait evolution. See main text for additional details.",fig.width=9}
 hab.cols<-setNames(c(rgb(0,1,0),rgb(0,0.5,0.5),rgb(1/3,1/3,1/3),
 	rgb(0,0,1),rgb(0.5,0.5,0),rgb(1,0,0)),levels(butterfly.habitat))
 par(fg="transparent")
@@ -325,7 +334,7 @@ legend("topleft",names(hab.cols),pch=21,pt.bg=hab.cols,pt.cex=1.5,
 
 Figure \@ref(fig:anc-fitpolyMk) shows both the observed (at the tips) and reconstructed (at the internal nodes) marginal probabilities for each of our states and polymorphic conditions.
 
-Lastly, let's graph the posterior distribution of the *accumulation* of lineages in each state over time, using the *phytools* function `ltt` as follows. We can do that using the same color palette as in Figure \@ref(fig:anc-fitpolyMk). (This graph is only especially meaningful for the situation in which the taxa of our phylogeny have been completely sampled. This is unlikely to be true here, but it should be nonetheless interesting to see.)
+Lastly, let's graph the posterior distribution of the *accumulation* of lineages in each state over time, using the *phytools* function `ltt` as follows. We can do that using the same color palette as in Figure \@ref(fig:anc-fitpolyMk). (This type of graph is only especially meaningful for the situation in which the taxa of our phylogeny have been completely sampled. Though this is unlikely to be true here, it should be nonetheless interesting to see.)
 
 ```{r ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps.",fig.height=3.5 }
 butterfly.ltt<-ltt(butterfly.simmap)
@@ -334,7 +343,7 @@ plot(butterfly.ltt,show.total=FALSE,bty="n",las=1,cex.axis=0.8,
   colors=hab.cols)
 ```
 
-The graph of Figure \@ref(fig;ltt-fitpolyMk) simultaneously shows the accumulation of lineages in each mono- or polymorphic state, but also the variation attributable to uncertainty in the evolutionary history of our group.
+The plot of Figure \@ref(fig;ltt-fitpolyMk) simultaneously shows the accumulation of lineages in each mono- or polymorphic state, but also the variation attributable to uncertainty in the evolutionary history of our group.
 
 # Continuous characters
 
@@ -387,7 +396,7 @@ Along with the simple calculateion of phylogenetic signal, *phytools* also conta
 
 Both of these plots are illustrated in Figure \@ref{phylosig} for our *Anolis* body size data.
 
-```{r phylosig, fig.cap="a) Blomberg et al. (2003) measured value of the *K* statistic for phylogenetic signal, compared to a null distribution of *K* obtained via randomization. b) Pagel's (1999) $\\lambda$ statistic for phylogenetic signal, also showing the likelihood surface.",fig.height=4}
+```{r phylosig, fig.cap="a) Blomberg et al. (2003) measured value of the *K* statistic for phylogenetic signal, compared to a null distribution of *K* obtained via randomization. b) Pagel's (1999) $\\lambda$ statistic for phylogenetic signal, also showing the likelihood surface.",fig.width=9}
 par(mfrow=c(1,2),cex=0.9)
 plot(anole.Blomberg_K,las=1,cex.axis=0.9)
 mtext("a)",adj=0,line=1)
@@ -483,15 +492,18 @@ This tells us that our phylogenetic tree contains 76 taxa and a mapped regime wi
 To rename my mapped traits I'll use the *phytools* function `mergeMappedTraits`. `mergeMappedTraits`, as readers can probably guess, is designed to merge the mappings of two or more traits into one -- but can also be employed to simply substitute one mapping name for another, as we'll use it here.
 
 ```{r}
-tropidurid.tree<-mergeMappedStates(tropidurid.tree,"n_rock","non-rock dwelling")
-tropidurid.tree<-mergeMappedStates(tropidurid.tree,"rock","rock-dwelling")
+tropidurid.tree<-mergeMappedStates(tropidurid.tree,"n_rock",
+  "non-rock dwelling")
+tropidurid.tree<-mergeMappedStates(tropidurid.tree,"rock",
+  "rock-dwelling")
 ```
 
 Let's plot this updated tree.
 
 ```{r trop-tree, fig.cap="Phylogenetic tree of tropidurid lizard species from Revell et al. (2022).",fig.height=3.5}
 cols<-setNames(c("white","black"),c("non-rock dwelling","rock-dwelling"))
-plot(tropidurid.tree,colors=cols,direction="upwards",outline=TRUE,lwd=3,
+sigmoidPhylogram(tropidurid.tree,direction="upwards",outline=TRUE,
+  colors=cols,direction="upwards",outline=TRUE,lwd=3,
   fsize=0.4,ftype="i",offset=1)
 legend("bottomright",c("non-rock dwelling","rock-dwelling"),pch=22,
   pt.bg=cols,cex=0.8,pt.cex=1.2)

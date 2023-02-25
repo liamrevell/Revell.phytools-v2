@@ -13,3 +13,11 @@ tiplabels(pie=Data,cex=0.2,piecol=cols)
 legend("topleft",names(cols),pch=21,pt.bg=cols,pt.cex=2,
   bty="n")
 ```
+
+```{r trop-tree, fig.cap="Phylogenetic tree of tropidurid lizard species from Revell et al. (2022).",fig.height=3.5}
+cols<-setNames(c("white","black"),c("non-rock dwelling","rock-dwelling"))
+plot(tropidurid.tree,colors=cols,direction="upwards",outline=TRUE,lwd=3,
+  fsize=0.4,ftype="i",offset=1)
+legend("bottomright",c("non-rock dwelling","rock-dwelling"),pch=22,
+  pt.bg=cols,cex=0.8,pt.cex=1.2)
+```
