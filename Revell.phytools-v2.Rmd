@@ -484,7 +484,7 @@ data(tropidurid.data)
 In this case, our phylogeny is *already* a tree with mapped regimes. We can see this by merely printing the model object that we loaded.
 
 ```{r}
-tropidurid.tree
+print(tropidurid.tree,printlen=2)
 ```
 
 This tells us that our phylogenetic tree contains 76 taxa and a mapped regime with two states: `"n_rock"` (non-rock dwelling) and `"rock"` (rock-dwelling). Since *phytools* permits mapped regimes to have arbitrary names, let's rename these levels in a more informative way.
@@ -498,12 +498,12 @@ tropidurid.tree<-mergeMappedStates(tropidurid.tree,"rock",
   "rock-dwelling")
 ```
 
-Let's plot this updated tree.
+Let's plot this updated tree. When I do this, I'm going to use the *phytools* plotting function `sigmoidPhylogram` which will plot our tree using curved ("sigmoidal") linking lines. (*phytools* contains lots of cool functions like this!)
 
 ```{r trop-tree, fig.cap="Phylogenetic tree of tropidurid lizard species from Revell et al. (2022).",fig.height=3.5}
 cols<-setNames(c("white","black"),c("non-rock dwelling","rock-dwelling"))
 sigmoidPhylogram(tropidurid.tree,direction="upwards",outline=TRUE,
-  colors=cols,direction="upwards",outline=TRUE,lwd=3,
+  colors=cols,direction="upwards",outline=TRUE,lwd=2,
   fsize=0.4,ftype="i",offset=1)
 legend("bottomright",c("non-rock dwelling","rock-dwelling"),pch=22,
   pt.bg=cols,cex=0.8,pt.cex=1.2)
@@ -553,9 +553,16 @@ primate.lnSkull<-setNames(log(primate.data$Skull_length),
 
 With this input data vector and our tree we're ready to run our penalized likelihood method. Invariably, penalized likelihood methods require the user to specify a smoothing parameter -- normally denominated $\lambda$. $\lambda$ determines the weight that's assigned to the penalty term of the fitted model, in our case a measure of how much (or little) the evolutionary rate varies from edge to edge in the tree. A large value of $\lambda$ will penalize high rate variation between edges and thus cause us to fit a model with relatively low rate heterogeneity. Small values of $\lambda$ allow the rate to vary with little smoothing cost. Multiple approaches, such as cross-validation, have been recommended to help us to identify a suitable value of $\lambda$ for our data -- however, *minimally* I would recommend testing multiple values of $\lambda$ and comparing the results. Let's try that here: first using $\lambda$ = 1.0 and then swapping it for a much smaller $\lambda$ = 0.1 and much larger $\lambda$ = 10 to see how these different values of our smoothing parameter affect our findings.
 
+Before we continue, let's create a simple projection of our trait data onto the tree. In this case, I'll use the *phytools* function `edge.widthMap` which sizes the thickness of our plotted branches in proportion to the observed or reconstructed values of our continuous trait.
+
+```{r primate-edgewidth, fig.cap="Primate skull lengths (on a log scale) projected onto the edges and nodes of the phylogeny.", fig.height=6}
+primate.widthMap<-edge.widthMap(primate.tree,primate.lnSkull)
+plot(primate.widthMap,color=palette()[2],legend="log(skull length)")
+```
+
 The function we'll use for this exercise, `multirateBM`, performs a computationally intensive optimization. Setting the optional argument `parallel=TRUE` will help distribute the computational burden across multiple processors, if possible.
 
-We'll start with $\lambda$ = 1.0.
+Let's start with $\lambda$ = 1.0.
 
 ```{r}
 primate.mBM_1<-multirateBM(primate.tree,primate.lnSkull,lamba=1,
@@ -594,7 +601,61 @@ We can see from the plot of Figure \@ref(fig:multirateBM) that even though the s
 
 In addition to the methods that we've seen so far, *phytools* also contains a handful of different techniques for investigating diversification. This is not a primary focus of the package, but these methods are popular and the *phytools* implementations relatively easy to use.
 
-## Speciation and extinction models
+## Lineage through time plots
+
+One of the simplest phylogenetic methods for studying diversification is to simply graph the accumulation of new lineages in our reconstructed phylogeny over time since the global root of the tree. This is called a lineage-through-time plot. If we graph the number of lineages through time in a fully sampled pure-birth (that is, constant-rate speciation but no extinction) phylogenetic tree, the accumulation curve should be *exponential* -- or linear on a semi-logarithmic scale.
+
+To see how the number of lineages through time are calculated and graphed using *phytools* let's load a phylogenetic tree of lizards from the diverse South American family Liolaemidae. This phylogeny is packaged with *phytools* but was published by Esquerre et al. (2019).
+
+```{r}
+data(liolaemid.tree)
+print(liolaemid.tree,printlen=2)
+```
+
+We'll create lineage-through-time graph with *phytools* over two steps. First, we'll use the *phytools* function `ltt` to compute an object of class `"ltt"` containing our tree and a count of the number of lineages through time from the root of the tree to the tips.
+
+```{r}
+liolaemid.ltt<-ltt(liolaemid.tree,plot=FALSE)
+liolaemid.ltt
+```
+
+From the print-out we see that in addition to the tree and the lineages through time, our object also contains a value of (and a p-value for) Pybus and Harvey's (2000) $\gamma$ statistic. $\gamma$ is a numerical value used to describe the general shape of the lineage through time curve. If the curve is *straight* (on a semi-log scale), then $\gamma$ should have a value close to zero. This is what we expect under a pure-birth (speciation only) diversification process. On the other hand, significantly *positive* or significantly *negative* $\gamma$ means that the lineage through time graph curves upward or downward towards the present day. This could mean that the rate of diversification has changed over time, but it could also be due to past extinction or incomplete taxon sampling (Revell and Harmon, 2022).
+
+We can see that for our liolaemid lizards, $\gamma$ is *positive*, though not significantly so.
+
+```{r liol-ltt, fig.cap="Lineage through time plot for phylogeny of lizards from the South American family Liolaemidae.",fig.height=4}
+par(mar=c(5.1,4.1,1.1,2.1))
+plot(liolaemid.ltt,show.tree=TRUE,lwd=3,
+  log.lineages=FALSE,log="y",bty="n",las=1,
+  cex.axis=0.8,cex.lab=0.9,transparency=0.2)
+```
+
+In general, accounting for incomplete taxon sampling in the measurement of Pybus and Harvey's (2000) $\gamma$ statistic is important because missing taxa will tend to pull out LTT curve *downwards* (in other words, towards more negative values of $\gamma$) as we approach the tips of the tree. Fortunately, there's a simple way to account for this. If we know the true species richness of our clade of interest, we can simulate trees that match this richness under pure-birth, randomly prune taxa to the level of missingness in our own data, and then use the distribution of $\gamma$ values across this set of simulated, and randomly pruned trees as our null distribution for hypothesis testing. This procedure is called the "Monte Carlo constant rates" (or MCCR) test. It's implemented in *phytools* as the function `mccr`.
+
+Of course, since the MCCR test accounts for randomly missing taxa from our tree, we must know or hypothesize a true species richness of our clade. In this instance, we're not too preoccupied about the precise value for liolaemid, but the *Reptile Database* puts the species richness of Liolaemidae at 340. For illustrative purposes, let's just go with that number!
+
+```{r, eval=FALSE}
+liolaemid.mccr<-mccr(liolaemid.ltt,rho=Ntip(liolaemid.tree)/340,
+  nsim=1000)
+liolaemid.mccr
+```
+```{r,echo=FALSE}
+load("liolaemid.mccr.rda")
+liolaemid.mccr
+```
+
+This tells us that (accounting for missing taxa) our observed value of $\gamma$ becomes highly significantly different from that expected under pure-birth. Let's plot our results.
+
+```{r liol-mccr, fig.cap="Lineage through time plot for phylogeny of lizards from the South American family Liolaemidae.",fig.height=4}
+plot(liolaemid.mccr,las=1,cex.lab=0.9,cex.axis=0.8)
+```
+
+Figure \@ref(fig:liol-mccr) shows that our measured $\gamma$ is strongly significantly *positive* -- in other words, much larger than expected by random chance under a constant-rate pure birth speciation process.
+
+## Modeling speciation and extinction
+
+
+
 
 # Visualization
 
