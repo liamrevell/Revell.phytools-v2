@@ -625,9 +625,9 @@ We can see that for our liolaemid lizards, $\gamma$ is *positive*, though not si
 
 ```{r liol-ltt, fig.cap="Lineage through time plot for phylogeny of lizards from the South American family Liolaemidae.",fig.height=4}
 par(mar=c(5.1,4.1,1.1,2.1))
-plot(liolaemid.ltt,show.tree=TRUE,lwd=3,
+plot(liolaemid.ltt,show.tree=TRUE,lwd=2,
   log.lineages=FALSE,log="y",bty="n",las=1,
-  cex.axis=0.8,cex.lab=0.9,transparency=0.2)
+  cex.axis=0.8,cex.lab=0.9,transparency=0.1)
 ```
 
 In general, accounting for incomplete taxon sampling in the measurement of Pybus and Harvey's (2000) $\gamma$ statistic is important because missing taxa will tend to pull out LTT curve *downwards* (in other words, towards more negative values of $\gamma$) as we approach the tips of the tree. Fortunately, there's a simple way to account for this. If we know the true species richness of our clade of interest, we can simulate trees that match this richness under pure-birth, randomly prune taxa to the level of missingness in our own data, and then use the distribution of $\gamma$ values across this set of simulated, and randomly pruned trees as our null distribution for hypothesis testing. This procedure is called the "Monte Carlo constant rates" (or MCCR) test. It's implemented in *phytools* as the function `mccr`.
@@ -654,8 +654,49 @@ Figure \@ref(fig:liol-mccr) shows that our measured $\gamma$ is strongly signifi
 
 ## Modeling speciation and extinction
 
+In addition to these analysis, *phytools* can also fit simple speciation and extinction models following Nee et al. (1994; Stadler, 2012). This is done using the function `fit.bd` which also allows us to take into account an incomplete taxonomic sampling fraction. Just as with Pybus and Harvey's $\gamma$, incomplete sampling also has the potentially to substantially distort our estimated speciation (normally given as $\lambda$ -- a different $\lambda$ from before!) and extinction ($\mu$). In this case, ignoring (or underestimating) the missing lineages in our tree will tend to cause us to underestimate the rate of extinction, as nearly all the information about extinction comes from the most recent parts of our tree! (See Revell and Harmon, 2022 for more details.)
 
+Fitting a birth-death model using *phytools* is easy.
 
+```{r}
+liolaemid.bd<-fit.bd(liolaemid.tree,
+  rho=Ntip(liolaemid.tree)/340)
+liolaemid.bd
+```
+
+We can also fit and compare this model to a simpler, pure-birth model: also called a 'Yule' model.
+
+```{r}
+liolaemid.yule<-fit.yule(liolaemid.tree,
+  rho=Ntip(liolaemid.tree)/340)
+liolaemid.yule
+```
+```{r}
+anova(liolaemid.yule,liolaemid.bd)
+```
+
+Overall, this result tells us that a birth-death (speciation and extinction) model is much better supported than our simpler Yule model.
+
+Lastly, the *phytools* function `fit.bd` exports a likelihood function as part of the fitted model object it returns. As such, it's a very straightforward thing to use that function to (for example) compute and graph the likelihood surface. We can do that using the base R *graphics* function `persp`. (But R contains lots of even fancier 3D plotting methods readers might be more interested in trying!)
+
+```{r liol-bd-3d, fig.cap="Visualization of the likelihood surface."}
+ngrid<-40
+b<-seq(0.25,0.45,length.out=ngrid)
+d<-seq(0.10,0.25,length.out=ngrid)
+logL<-matrix(NA,ngrid,ngrid)
+for(i in 1:ngrid) for(j in 1:ngrid)
+  logL[i,j]<-liolaemid.bd$lik(c(b[i],d[j]))
+logL[is.nan(logL)]<-min(logL[!is.nan(logL)])
+par(mar=rep(0.1,4))
+persp(b,d,exp(logL),shade=0.3,
+  phi=45,theta=20,
+  xlab="speciation rate",
+  ylab="extinction rate",
+  zlab="likelihood",
+  border=palette()[4],expand=0.3)
+```
+
+Our graph shows the very strong *ridge* in the likelihood surface (from low $\lambda$ and low $\mu$, to high $\lambda$ and high $\mu$) that invariably tends to characterize the likelihood surfaces of birth-death models and often so befuddles estimation!
 
 # Visualization
 
