@@ -21,3 +21,19 @@ plot(tropidurid.tree,colors=cols,direction="upwards",outline=TRUE,lwd=3,
 legend("bottomright",c("non-rock dwelling","rock-dwelling"),pch=22,
   pt.bg=cols,cex=0.8,pt.cex=1.2)
 ```
+
+
+Lastly, birth-death models are often opitimized in terms of a re-parameterization of the likelihood surface, $\lambda$ - $\mu$ (net diversification rate) and $\mu$/$\lambda$ (extinction fraction, often assigned the Greek letter $\epsilon$). It's not hard to use our likelihood function to optimize...
+
+```{r}
+lik<-function(par,func){
+    net<-par[1]
+    eps<-par[2]
+    d=net/(1/eps+1)
+    b=net+d
+    -func(c(b,d))
+}
+liolaemid.div<-optim(c(1,0),lik,func=liolaemid.bd$lik,
+  method="L-BFGS-B",lower=c(1e-3,1e-3))
+liolaemid.div
+```

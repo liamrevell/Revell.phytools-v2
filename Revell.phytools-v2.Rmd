@@ -700,18 +700,77 @@ Our graph shows the very strong *ridge* in the likelihood surface (from low $\la
 
 # Visualization
 
+After phylogenetic comparative methods, *phytools* is perhaps best known for its phylogeny visualization methods. We've seen a number of these methods deployed already throughout this article. For example, in Figures \@ref(fig:simmap-trees), \@ref(fig:posterior-probs), \@ref(fig:num-changes), \@ref(fig:densityMap), \@ref(fig:anc-fitpolyMk), and \@ref(fig:trop-tree) I illustrated custom *phytools* plotting methods for stochastic character mapping and the analysis of stochastic character mapped trees. Likewise, in Figures \@ref(fig:structure-polyMk) and \@ref(fig:ordered-ard-fitpolyMk) I demonstrate *phytools* plotting methods for fitted discrete character evolution models. In Figures \@ref(fig:phylosig), \@ref(fig:cordylid-ace), \@ref(fig:primate-edgewidth), and \@ref(fig:multirateBM) I show a variety of custom methods for visualization continuous trait evolution. Finally, in Figure \@ref(fig:ltt-fitpolyMk), \@ref(fig:liol-ltt), and \@ref(fig:liol-mccr) I illustrate several methods for visualizing diversification or the results from a diversification analysis using a phylogeny. This is a sparse sample of the variety of plotting methods for phylogenies, phylogenetic comparative data, and the results of phylogenetic analysis that are implemented in the *phytools* R package. In this final section, I'll illustrate just a few more popular plotting methods of the package that we haven't seen in prior sections.
+
 ## Projecting a tree onto a geographic map
 
 *phytools* can be used to project a phylogenetic tree onto a geographic map.
 
-```{r mammal-geog, fig.cap="A phylogenetic tree of mammals projected onto a geographic map."}
+To see how this is done in R, we can load two datasets that come with the *phytools* package. The first is a phylogenetic tree (`mammal.tree`) from Garland et al. (1992); the second is a corresponding geographic dataset that I obtained by sampling 1-3 records at random from the online citizen science resource *iNaturalist*.
+
+```{r}
 data(mammal.tree)
 data(mammal.geog)
-chk<-geiger::name.check(mammal.tree,mammal.geog)
-mammal.pruned<-drop.tip(mammal.tree,chk$tree_not_data)
-mammal.map<-phylo.to.map(mammal.pruned,mammal.geog,
-  plot=FALSE,quiet=TRUE)
-plot(mammal.map,fsize=0.6,ftype="i",
-  colors=palette()[4])
 ```
 
+Our data (`mammal.geog`) come in the form of a *matrix*. This is important to note because our plotting function allows more than one geographic record per species and requires that our taxon labels be supplied as row names. The most common way to read data into R (for instance, using `read.table` or `read.csv`) with create a data frame, rather than a matrix, and R data frames do not permit repeating row names! The easiest way to resolve this is to read our data in with species as a data column rather than as row names, and then using our input data to create a matrix object within R.
+
+```{r}
+head(mammal.geog)
+```
+
+I happen to know that there are some mismatches between our input tree and data. (This is because I didn't include geographic records for all species when I was creating `mammal.geog`, but it's a common problem with comparative data!)
+
+To identify these, I'm going to use the function `name.check` from the *geiger* comparative methods package (Pennell et al., 2014). *geiger* is not a dependent package of *phytools*, but I suspect most readers will already have it installed. If not, it can be installed from CRAN in the typical fashion.
+
+```{r}
+library(geiger)
+chk<-name.check(mammal.tree,mammal.geog)
+summary(chk)
+```
+
+This tells us that there are two taxa in our tree that are missing from our geographic data, so we can prune with out using the *ape* function `drop.tip`.
+
+```{r}
+mammal.pruned<-drop.tip(mammal.tree,chk$tree_not_data)
+name.check(mammal.pruned,mammal.geog)
+```
+
+Our next step is to build the map projection that we intend to plot. This is done using the *phytools* function `phylo.to.map`. In addition to combining our phylogenetic tree and map data, this function also performs a series of node rotations to try to optimize the alignment of our phylogeny with the geographic coordinates of our tip data. Since node rotation is arbitrary anyway, this can be helpful to facilitate a more convenient visualization.
+
+```{r}
+mammal.map<-phylo.to.map(mammal.pruned,mammal.geog,
+  plot=FALSE,quiet=TRUE)
+mammal.map
+```
+
+Our plotting function for this object class allows us to specify different colors for the different species being plotted. Let's do that here by choosing random colors from a divergent color palette using the CRAN package *randomcoloR* (Ammar, 2019). (Readers lacking this package should install it from CRAN -- or they can elect to use a different palette, or none at all.)
+
+```{r,echo=FALSE}
+set.seed(999)
+cols<-setNames(
+  randomcoloR::distinctColorPalette(Ntip(mammal.pruned)),
+  mammal.pruned$tip.label)
+```
+```{r,eval=FALSE}
+cols<-setNames(
+  randomcoloR::distinctColorPalette(Ntip(mammal.pruned)),
+  mammal.pruned$tip.label)
+```
+
+Finally, we're ready to plot our tree.
+
+```{r mammal-geog, fig.cap="A phylogenetic tree of mammals projected onto a geographic map."}
+plot(mammal.map,fsize=0.5,ftype="i",
+  colors=cols,asp=0.9,lwd=1)
+```
+
+In this case, the lineages of our phylogeny have a near-global distribution. For phylogenetic trees whose terminal taxa have a narrower geographic range, including phylogeographic studies, it's possible to restrict the plotted maps to countries or regions, or even to supply a custom map!
+
+### Co-phylogenetic plotting
+
+## Relationship of *phytools* to other packages
+
+## Conclusions
+
+## References
