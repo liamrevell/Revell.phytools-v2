@@ -700,7 +700,18 @@ Our graph shows the very strong *ridge* in the likelihood surface (from low $\la
 
 # Visualization
 
+## Projecting a tree onto a geographic map
 
+*phytools* can be used to project a phylogenetic tree onto a geographic map.
 
-
+```{r mammal-geog, fig.cap="A phylogenetic tree of mammals projected onto a geographic map."}
+data(mammal.tree)
+data(mammal.geog)
+chk<-geiger::name.check(mammal.tree,mammal.geog)
+mammal.pruned<-drop.tip(mammal.tree,chk$tree_not_data)
+mammal.map<-phylo.to.map(mammal.pruned,mammal.geog,
+  plot=FALSE,quiet=TRUE)
+plot(mammal.map,fsize=0.6,ftype="i",
+  colors=palette()[4])
+```
 
