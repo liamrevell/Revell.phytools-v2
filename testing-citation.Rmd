@@ -1,0 +1,26 @@
+---
+title: 'phytools 2.0'
+subtitle: 'An updated R ecosystem for phylogenetic comparative methods (and other things)'
+header-includes: |
+    \usepackage{fancyhdr}
+    \pagestyle{fancy}
+    \fancyhead[L]{Revell, L. J. (2023)}
+    \fancyhead[C]{}
+    \fancyhead[R]{phytools 2.0}
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: Liam J. Revell, University of Massachusetts Boston
+bibliography: phytools-v2.bib
+csl: evolution.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+Modern phylogenetic comparative methods are not new. Perhaps the most important article in the development of the phylogenetic approach to comparative biology [@Felsenstein1985-bt] was first authored nearly 40 years ago, and was even the subject of a recent retrospective [@Huey2019-zv]. Nonetheless, it's fair to say that phylogenetic comparative methods have seen a relatively impressive expansion and diversification over the past two decades [e.g., @Butler2004-av; @Felsenstein2005-am; @OMeara2006-cq; @Maddison2007-mi; @Hohenlohe2008-sj; @Revell2009-bo; @Morlon2010-qy; @Stadler2011-jy; @Etienne2012-gk; @Goldberg2012-gs; @Beaulieu2013-zo; @Rabosky2014-qo; @Uyeda2014-ng; @Beaulieu2016-ww; @Revell2021, and many others; reviewed in @Garamszegi2014-dt; @Harmon2019-on; @Revell2022-book]. This has included the development of new approaches for studying the generating processes of trees (that is, speciation and extinction), the relationship between phenotypic traits and species diversification, and a range of approaches for investigating heterogeneity in the evolutionary process across the branches and clades of the tree of life. Phylogenetic comparative methods have also begun to be applied outside their traditional domain of evolutionary research. In particular, phylogenies and the comparative method have made recent appearances in studies on infectious disease epidemiology, virology, sociolinguistics, biological anthropology, molecular genomics, and community ecology, among other disciplines [e.g., @Moura2016-as; @Baele2018-wc; @Bentz2018-xa; @Beale2019-bx; @Bushman2019-fs; @Sanchez-Buso2019-nc; @Valles-Colomer2019-fk; @Freitas2020-rw; @Jezovit2020-bi; @Blinkhorn2021-gk; @McLaughlin2022-wt; @Pepke2022-wh; @Pozzi2022-wx; @Compton2023-nc; @Mifsud2023-et; @Van_Borm2023-db, and many others].

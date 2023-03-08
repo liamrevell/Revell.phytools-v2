@@ -1,0 +1,119 @@
+---
+title: 'Re-analysis of Carballo (2022) co-phylogenetic plot'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+author: Liam J. Revell
+---
+
+As I mentioned in the Slack, I'm presently working on a new (extend) application note for the updated *phytools* R package. In this article I have included a number of different, fully-functional R workflows, similar to those that we use in our class exercises and that fill my book with Luke. *phytools* contains a very popular co-phylogenetic ("tanglegram") plotting method called `cophylo`. Unfortunately, I was having a lot of difficulty encountering published data to illustrate it in my paper!
+
+I found one example that I liked in a paper by Caraballo ([2022](https://doi.org/10.1128/spectrum.01411-22)), giving the phylogenetic association of bats and their betacoronaviruses. Unfortunately, the author didn't publish the trees or original data in a usable format. The only "available" data was a set of tables (published in PDF format, no less) with *GenBank* accession numbers for all of the sequences used in the study!
+
+I decided to start there anyway, and see what I could do to pull down each of these sequences based on their accession numbers, align the sequences, and do phylogenetic inference in R.
+
+As an important sidenote, to replicate this analysis you will need to download the stand-alone program *MUSCLE* ([here](https://www.drive5.com/muscle/)), and then (in Windows) add the directory of this program to your [PATH environment variable](https://geekrewind.com/how-to-add-and-edit-path-environment-variables-in-windows-11/). Other than that, I just pulled the PDFs from Caraballo's supplement, used Adobe to convert it to a Word doc, imported to Excel, and saved as a CSV file to read into R!
+
+Load packages.
+
+```{r}
+library(phytools)
+library(phangorn)
+```
+
+Read my bat accession data.
+
+```{r}
+Bats<-read.csv(file="Bats.csv")
+Bats
+```
+
+This contains accession numbers for both alpha- and betacoronaviruses. I decided to just do the betacoronaviruses.
+
+```{r}
+betaAccessions<-setNames(
+	Bats$Accession[which(Bats$Host.type=="betaCoV")],
+	Bats$Species[which(Bats$Host.type=="betaCoV")])
+betaAccessions
+```
+
+Next, I'll use the *ape* function `read.GenBank` to pull the corresponding sequences from *GenBank*.
+
+```{r}
+betaBats<-read.GenBank(betaAccessions,seq.names=names(betaAccesions))
+betaBats
+```
+
+These sequences are all *almost* the same length, so they may already be (mostly) aligned. We can use MUSCLE to align them anyway.
+
+```{r}
+betaBats.aligned<-muscle5(betaBats)
+betaBats.aligned
+```
+
+We're already ready to estimate our tree. We could do model selection, but I decided just to use `"GTR+G(4)+I"`.
+
+```{r}
+betaBat_pml<-pml_bb(betaBats.aligned,model="GTR+G(4)+I")
+```
+
+Done! Let me pull out my tree.
+
+```{r}
+bat_mltree_unrooted<-betaBat_pml$tree
+bat_mltree_unrooted
+```
+
+We can proceed to root it. Generally speaking, this wouldn't be advised, but I happen to know that the method of *midpoint rooting* will give me the tree of Caraballo (2022).
+
+```{r}
+plotTree(bat.tree<-untangle(midpoint(bat_mltree_unrooted),"read.tree"))
+```
+
+This tree has accession numbers instead of species labels -- but we know how they're related, so let's update them.
+
+```{r}
+spp<-setNames(names(betaAccessions),betaAccessions)
+bat.tree$tip.label<-spp[bat.tree$tip.label]
+plotTree(bat.tree,ftype="i")
+```
+
+Great. So far, so good.
+
+Next, let's do much the same with our betacoronavirus sequences. In this case, we don't have named lineages -- all we've got are the *GenBank* labels, so we can just keep these as our OTU names.
+
+```{r}
+betaCovs<-read.csv(file="betaCovs.csv")
+betaCovs_seqs<-read.GenBank(betaCovs$Accession.Number)
+betaCovs_seqs.aligned<-muscle5(betaCovs_seqs)
+betaCovs_tree<-pml_bb(betaCovs_seqs.aligned,
+  model="GTR+G(4)+I")
+plotTree(virus.tree<-untangle(midpoint(betaCovs_tree$tree),
+  "read.tree"))
+```
+
+We can next build a table of associations between the taxa in our bat tree and the taxa in our virus tree. Once again, this is from the supplemental material of Caraballo (2022).
+
+```{r}
+assoc<-data.frame(Bats=betaCovs$Host.species,
+  betaCoVs=betaCovs$Accession.Number)
+assoc
+```
+
+One thing I noticed right away is that the tip labeled `"Glossophaga soricina"` in the tree is actually coded by the subfamily, `"Glossophaginae"`, in our association table.
+
+```{r}
+assoc[assoc$Bats=="Glossophaginae",1]<-"Glossophaga soricina"
+```
+
+```{r}
+obj<-cophylo(bat.tree,virus.tree,assoc=assoc)
+obj
+```
+
+We're done!
+
+```{r}
+plot(obj,link.lty="solid",link.type="curved",fsize=c(0.9,0.8))
+```
+
+
