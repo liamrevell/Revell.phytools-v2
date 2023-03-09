@@ -388,7 +388,7 @@ To obtain these distributions, we'll first call the generic method \texttt{densi
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\AttributeTok{las=}\DecValTok{1}\NormalTok{,}\AttributeTok{cex.axis=}\FloatTok{0.7}\NormalTok{,}
   \AttributeTok{cex.lab=}\FloatTok{0.8}\NormalTok{)}
-\NormalTok{COLS}\OtherTok{\textless{}{-}}\FunctionTok{setNames}\NormalTok{(cols,sunfish.density}\SpecialCharTok{$}\NormalTok{trans)}
+\NormalTok{COLS}\OtherTok{\textless{}{-}}\FunctionTok{setNames}\NormalTok{(cols[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{1}\NormalTok{],sunfish.density}\SpecialCharTok{$}\NormalTok{trans)}
 \FunctionTok{plot}\NormalTok{(sunfish.density,}\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.6}\NormalTok{),}
   \AttributeTok{transition=}\FunctionTok{names}\NormalTok{(COLS)[}\DecValTok{1}\NormalTok{],}\AttributeTok{colors=}\NormalTok{COLS[}\DecValTok{1}\NormalTok{],}
   \AttributeTok{main=}\StringTok{""}\NormalTok{)}
@@ -1126,7 +1126,7 @@ Having fit each of four models (in this case: \texttt{evolvcv.lite} actually inc
 ## model 1 52.30560    5 -94.61119 0.09221085
 ## model 2 54.39681    7 -94.79362 0.10101737
 ## model 3 55.11048    6 -98.22096 0.56057433
-## model 4 56.28765    8 -96.57530 0.24619745
+## model 4 56.28765    8 -96.57530 0.24619744
 \end{verbatim}
 
 This comparison shows us that \texttt{"model\ 3"} is the best-supported explanation of our data in this set. Indeed, this model is one in which the evolutionary covariance between overall body size and dorsoventral flattening is negative among rock-dwelling lineages -- compared to the positive evolutionary covariance in non-rock species and across all other models, just as we'd predicted. Size and body depth are indeed evolutionarily decoupled in rock-dwelling forms!

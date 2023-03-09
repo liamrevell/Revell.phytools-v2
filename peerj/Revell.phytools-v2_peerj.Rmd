@@ -209,7 +209,7 @@ sunfish.density
 ```{r num-changes, fig.cap="Posterior probability distributions of changes from either a) non-piscivory to piscivory, or b) piscivory to non-piscivory, obtained from an analysis of stochastic mapping. HPD indicates the 95\\% high probability density interval for changes of each type. See main text for additional details.",fig.height=3.5, out.width = "100%"}
 par(mfrow=c(1,2),las=1,cex.axis=0.7,
   cex.lab=0.8)
-COLS<-setNames(cols,sunfish.density$trans)
+COLS<-setNames(cols[2:1],sunfish.density$trans)
 plot(sunfish.density,ylim=c(0,0.6),
   transition=names(COLS)[1],colors=COLS[1],
   main="")
