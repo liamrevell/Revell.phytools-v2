@@ -828,7 +828,7 @@ One of the most rudimentary phylogenetic methods for studying diversification is
 
 One of the great appeals of this visualization is that if we graph the number of lineages through time in a fully-sampled pure-birth (that is, constant-rate speciation, but no extinction) phylogenetic tree, the accumulation curve should be exponential -- or exactly linear on a semi-logarithmic scale. This means that the lineage-through-time plot gives us a handy tool that we can use to compare the real lineage accumulation in our reconstructed tree to this simple, neutral expectation [@Pybus2000-sf; @Revell2022-book].
 
-To see how the number of lineages through time are calculated and graphed using *phytools*, let's load a phylogenetic tree of lizards from the diverse South American family Liolaemidae. This phylogeny is packaged with *phytools* but was published by @Esquerre2019-ju.
+To see how the number of lineages through time are calculated and graphed using *phytools*, let's load a phylogenetic tree of lizards from the diverse South American family Liolaemidae. This phylogeny is packaged with *phytools* but was published by @Esquerr2019.
 
 ```{r}
 data(liolaemid.tree)
