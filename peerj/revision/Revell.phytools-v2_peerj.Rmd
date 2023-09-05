@@ -13,7 +13,7 @@ affiliation:
   - code: 2
     address: Facultad de Ciencias, Universidad Católica de la Santísima Concepción, Concepción, Chile
 abstract: >
-  Phylogenetic comparative methods comprise the general endeavor of using an estimated phylogenetic tree (or set of trees) to make secondary inferences: about trait evolution, diversification dynamics, biogeography, community ecology, and a wide range of other phenomena or processes. Over the past ten years or so, the *phytools* R package [@Revell2012] has grown to become an important research tools for phylogenetic comparative analysis. *phytools* is a diverse contributed R library now consisting of hundreds of different functions covering a variety of methods and purposes in phylogenetic biology. As of the time of writing, *phytools* included functionality for fitting models of trait evolution, for reconstructing ancestral states, for studying diversification on trees, and for visualizing phylogenies, comparative data, and fitted models, as well numerous other tasks related to phylogenetic biology. Here, I describe some significant features of and recent updates to *phytools*, while also illustrating several popular workflows of the *phytools* computational software.
+  Phylogenetic comparative methods comprise the general endeavor of using an estimated phylogenetic tree (or set of trees) to make secondary inferences: about trait evolution, diversification dynamics, biogeography, community ecology, and a wide range of other phenomena or processes. Over the past ten years or so, the *phytools* R package [@Revell2012] has grown to become an important research tool for phylogenetic comparative analysis. *phytools* is a diverse contributed R library now consisting of hundreds of different functions covering a variety of methods and purposes in phylogenetic biology. As of the time of writing, *phytools* included functionality for fitting models of trait evolution, for reconstructing ancestral states, for studying diversification on trees, and for visualizing phylogenies, comparative data, and fitted models, as well numerous other tasks related to phylogenetic biology. Here, I describe some significant features of and recent updates to *phytools*, while also illustrating several popular workflows of the *phytools* computational software.
 header-includes: |
     \usepackage{fancyhdr}
     \pagestyle{fancy}
@@ -94,7 +94,7 @@ Perhaps the most important and widely-used discrete character analysis of *phyto
 
 Stochastic mapping in *phytools* can be undertaken in more than one way. An example of a stochastic character mapping analysis could be to first fit (e.g., using Maximum Likelihood) the character transition model [a variant of the M*k* discrete character evolution model of @Lewis2001-bu; also see, @OMeara2012; @Harmon2019-on; @Revell2022-book], and then proceed to randomly sample a set of perhaps 100 or 1,000 stochastic character histories -- each consistent with the phenotypic trait observations that we have for the terminal taxa of our tree, and obtained in proportion to their probability under our fitted model. [Other workflows are also popular and possible to undertake within R. For instance, rather than use a single, fixed model of character evolution that's been optimized using Maximum Likelihood, one might instead sample parameters of the evolutionary process from their joint posterior probability distribution using Bayesian MCMC. See @Revell2022-book for more details.]
 
-To illustrate stochastic mapping here, I'll use a discretely-valued, ecological trait for a small phylogeny of centrarchid fishes from @Revell2009-bo. Since the trait (which we'll refer to as "feeding mode") is binary, meaning that it only takes two levels, there are a total of four possible discrete character [extended M*k*, see @Harmon2019-on] models: equal back-and-forth transitions between the two character values; different rates; and then the two different irreversible trait evolution models.
+To illustrate stochastic mapping here, I'll use a discretely-valued, ecological trait for a small phylogeny of centrarchid fishes from @Near2005 [also see @Revell2009-bo; @Revell2022-tr]. Since the trait (which we'll refer to as "feeding mode") is binary, meaning that it only takes two levels, there are a total of four possible discrete character [extended M*k*, see @Harmon2019-on] models: equal back-and-forth transitions between the two character values; different rates; and then the two different irreversible trait evolution models.
 
 *phytools* now allows us to fit a single model or any arbitrary set of models, compare them (if applicable), and pass the model weights and fitted models directly to our stochastic mapping function. If the input is a set of models, as it will be in our example below, our function (called `simmap`) will then proceed to automatically sample stochastic character histories with probabilities that are proportional to each model weight. Experienced *phytools* users may figure out that `simmap` is just a sophisticated wrapper function of `make.simmap` -- the traditional method used for undertaking stochastic character mapping in *phytools*. A major advantage of sampling stochastic maps across a set of models, rather than under our single best model, is that it allows us to integrate over model uncertainty in direct proportion to the weight of evidence favoring each model in our set.
 
@@ -168,9 +168,9 @@ If we preferred, we could've generated stochastic character maps for just the be
 
 In spite of the significant number of stochastic simulations involved, this analysis should run fairly quickly (obviously, depending on the speed of our computer). In part this is because we saved computation time by circumventing the need to re-estimate our M*k* transition matrix, **Q**, separately for each sampled model. An additional advantage of this approach is that it's also allowed us to (partly) account for variation in our modeled process of evolution that's due to uncertainty in model selection.
 
-Figure \@ref(fig:simmap-trees) shows a set of six, randomly chosen stochastic character histories for our trait (feeding mode) on our input tree. Readers should see that each of these are consistent with our observed value of the binary trait at the tips of the tree, but that each differs one from the other in the specific hypothesis of trait evolution that it represents. 
+Figure \@ref(fig:fig01-simmap-trees) shows a set of six, randomly chosen stochastic character histories for our trait (feeding mode) on our input tree. Readers should see that each of these are consistent with our observed value of the binary trait at the tips of the tree, but that each differs one from the other in the specific hypothesis of trait evolution that it represents. 
 
-```{r simmap-trees, fig.cap="Six randomly chosen stochastic character maps of feeding mode (non-piscivorous, in dark blue, vs. piscivorous) on a phylogeny of 28 centrarchid fish species. Stochastic character mapping involves randomly sampling character histories that are consistent with our tip data in proportion to their probability under a model. In this case, histories were sampled under the set of four alternative M\\textit{k} models of a binary trait, with relative frequencies proportional to the weight of evidence supporting each model. The tree and data are modified from Revell and Collar (2009). See main text for additional details.", out.width = "100%"}
+```{r fig01-simmap-trees, fig.cap="Six randomly chosen stochastic character maps of feeding mode (non-piscivorous, in dark blue, vs. piscivorous) on a phylogeny of 28 centrarchid fish species. Stochastic character mapping involves randomly sampling character histories that are consistent with our tip data in proportion to their probability under a model. In this case, histories were sampled under the set of four alternative M\\textit{k} models of a binary trait, with relative frequencies proportional to the weight of evidence supporting each model. Data are from Near et al. (2005), Revell and Collar (2009), and Revell et al. (2022). See main text for additional details.", out.width = "100%"}
 cols<-setNames(viridisLite::viridis(n=2),
   levels(sunfish.feed_mode))
 par(mfrow=c(2,3))
@@ -178,20 +178,20 @@ plot(sample(sunfish.simmap,6),ftype="i",fsize=0.6,
   colors=cols,offset=0.2)
 ```
 
-To create my color palette for plotting I used another contributed R package that we haven't seen yet called *viridisLite* by @Garnier2022. *viridisLite* implements a color palette [known as the "viridis" palette and originally devised by @vanderWalt2015] that was designed to be both attractive and colorblind-friendly. To replicate Figure \@ref(fig:simmap-trees) exactly, users should first install *viridisLite* from CRAN by running `install.packages("viridisLite")` -- but they do not need to load it. Calling the contributed package function using the double colon syntax, `::`, takes care of that (i.e., `viridisLite::viridis`).
+To create my color palette for plotting I used another contributed R package that we haven't seen yet called *viridisLite* by @Garnier2022. *viridisLite* implements a color palette [known as the "viridis" palette and originally devised by @vanderWalt2015] that was designed to be both attractive and colorblind-friendly. To replicate Figure \@ref(fig:fig01-simmap-trees) exactly, users should first install *viridisLite* from CRAN by running `install.packages("viridisLite")` -- but they do not need to load it. Calling the contributed package function using the double colon syntax, `::`, takes care of that (i.e., `viridisLite::viridis`).
 
-Although Figure \@ref(fig:simmap-trees) already gives us a general sense of the uncertainty of our ancestral character history on the tree for our trait, most commonly we don't want to simply graph a subset (or all) of our stochastically mapped trees. Typically, instead, we'd first summarize our stochastic character maps (in multiple ways), and then proceed to plot or analyze these summarized findings.
+Although Figure \@ref(fig:fig01-simmap-trees) already gives us a general sense of the uncertainty of our ancestral character history on the tree for our trait, most commonly we don't want to simply graph a subset (or all) of our stochastically mapped trees. Typically, instead, we'd first summarize our stochastic character maps (in multiple ways), and then proceed to plot or analyze these summarized findings.
 
 Often, *phytools* users undertaking stochastic character mapping will compute the posterior probabilities of each value of the character trait at each internal node of the tree, which one can obtain by simply *counting* the fraction of stochastic maps for which each node is in each of the observed states of our character trait. These values correspond to a form of ancestral state estimation, giving us an approximation of the marginal probabilities that each hypothetical ancestor at each node of the tree was in each of our observed states. We've conditioned on our transition model and its Maximum Likelihood parameter estimates -- although in this instance we also *integrate* across a set of four evolutionary models in proportion to the weight of evidence in support of each one. In *phytools*, these values marginal posterior probabilities can be obtained using the generic `summary` method for our object class, which is then easily plotted as follows.
 
-```{r posterior-probs, fig.cap="Posterior probabilities at each ancestral node of the centrarchid tree of Figure 1 from stochastic character mapping using model weights to sample across four different extended M\\textit{k} trait evolution models. See main text for more details.",fig.height=3.5, out.width = "100%"}
+```{r fig02-posterior-probs, fig.cap="Posterior probabilities at each ancestral node of the centrarchid tree of Figure 1 from stochastic character mapping using model weights to sample across four different extended M\\textit{k} trait evolution models. See main text for more details.",fig.height=3.5, out.width = "100%"}
 plot(summary(sunfish.simmap),ftype="i",fsize=0.7,
   colors=cols,cex=c(0.6,0.3))
 legend("topleft",levels(sunfish.feed_mode),pch=21,
   pt.cex=1.5,pt.bg=cols,bty="n",cex=0.8)
 ```
 
-A correct interpretation of the graph of Figure \@ref(fig:posterior-probs) is that it shows the observed discrete character states (at the tips of the tree) and the posterior probabilities from stochastic mapping that each internal node is in each state -- all while integrating over our four different transition models in proportion to the weight of evidence for each model!
+A correct interpretation of the graph of Figure \@ref(fig:fig02-posterior-probs) is that it shows the observed discrete character states (at the tips of the tree) and the posterior probabilities from stochastic mapping that each internal node is in each state -- all while integrating over our four different transition models in proportion to the weight of evidence for each model!
 
 In addition to node probabilities, *phytools* users undertaking a stochastic character mapping analysis are often interested in the number of changes of each type that are implied by the evolutionary process and our data. The procedure of stochastic mapping samples full character histories (not just states or probabilities at nodes) and can thus be deployed to produce estimates of the posterior probability distribution of the character changes of each type on specific edges, in specific clades, or across the entire phylogeny, conditioning on our sampled model or models.
 
@@ -201,7 +201,7 @@ To obtain these distributions, we'll first call the generic method `density` whi
 sunfish.density<-density(sunfish.simmap)
 sunfish.density
 ```
-```{r num-changes, fig.cap="Posterior probability distributions of changes from either a) non-piscivory to piscivory, or b) piscivory to non-piscivory, obtained from an analysis of stochastic mapping. HPD indicates the 95\\% high probability density interval for changes of each type. See main text for additional details.",fig.height=3.5, out.width = "100%"}
+```{r fig03-num-changes, fig.cap="Posterior probability distributions of changes from either a) non-piscivory to piscivory, or b) piscivory to non-piscivory, obtained from an analysis of stochastic mapping. HPD indicates the 95\\% high probability density interval for changes of each type. See main text for additional details.",fig.height=3.5, out.width = "100%"}
 par(mfrow=c(1,2),las=1,cex.axis=0.7,cex.lab=0.8)
 COLS<-setNames(cols[2:1],sunfish.density$trans)
 plot(sunfish.density,ylim=c(0,0.6),
@@ -214,11 +214,11 @@ mtext("b) transitions to non-piscivory",line=1,adj=0,
   cex=0.8)
 ```
 
-The distributions shown in Figure \@ref(fig:num-changes) give the relative frequencies of changes of each type across our set of mapped histories, as well as Bayesian 95\% high probability density (HPD) intervals calculated using the R pakage *coda* [@Plummer2006]. For a binary trait like that of this example (and thus with only two types of transitions), we could have instead overlain the distributions of backwards and forwards transitions in character state in a single plot panel. In this particular instance, however, I found that overplotting the two different distributions resulted in a figure that was too difficult to read, and preferred instead to show the distributions in separate panels as in Figure \@ref(fig:num-changes). For multistate characters with more than two types of changes between states, the same `plot` method will produce a *k* $\times$ *k* matrix of figure panels, each *i*,*j*th panel of which will contain the posterior distribution of changes from character state *i* to *j*.
+The distributions shown in Figure \@ref(fig:fig03-num-changes) give the relative frequencies of changes of each type across our set of mapped histories, as well as Bayesian 95\% high probability density (HPD) intervals calculated using the R pakage *coda* [@Plummer2006]. For a binary trait like that of this example (and thus with only two types of transitions), we could have instead overlain the distributions of backwards and forwards transitions in character state in a single plot panel. In this particular instance, however, I found that overplotting the two different distributions resulted in a figure that was too difficult to read, and preferred instead to show the distributions in separate panels as in Figure \@ref(fig:fig03-num-changes). For multistate characters with more than two types of changes between states, the same `plot` method will produce a *k* $\times$ *k* matrix of figure panels, each *i*,*j*th panel of which will contain the posterior distribution of changes from character state *i* to *j*.
 
 An interesting attribute of the character state change distributions for this centrarchid feeding mode analysis is that they are both markedly bi-modal. This is due, in part, to our specific procedure of model-averaging in which we sampled both reversible and irreversible character evolution models in proportion to their weights, and isn't something we would've seen had we chosen to analyze just one model or the other. (Recall that the weight of evidence was highly similar between our equal-rates model and the irreversible model in which piscivory is acquired from non-piscivory, but never the reverse. See above.) This pattern is also appropriately captured by the broad HPD intervals on each of the two types of transitions.
 
-Lastly, in addition to these analyses, *phytools* also makes it quite straightforward to visualize the posterior probabilities of each of the two trait conditions not only at nodes, but also also along the branches of the phylogeny. This is accomplished using the *phytools* function `densityMap` [@Revell2013-ij], which creates a graph showing the probability density of stochastic histories in each of our mapped states. By design, in *phytools* this object can be first created (using the `densityMap` function), updated (using the method `setMap` to adjust our color palette for plotting), and then graphed (using a generic `plot` method that was created for this specific object class). I'll illustrate this set of procedures in the following code block.
+Lastly, in addition to these analyses, *phytools* also makes it quite straightforward to visualize the posterior probabilities of each of the two trait conditions not only at nodes, but also also along the branches of the phylogeny. This is accomplished using the *phytools* function `densityMap` [@Revell2013-ij], which creates a graph showing the probability density of stochastic histories in each of our mapped states. By design, in *phytools* this object can be first created (using the `densityMap` function), updated (using the method `setMap` to adjust our color palette for plotting), and then graphed (using a generic `plot` method that was created for this specific object class). I'll illustrate this set of procedures in the following code block. The resultant plot is shown in Figure \@ref(fig:fig04-densityMap).
 
 ```{r, eval=FALSE}
 sunfish.densityMap<-densityMap(sunfish.simmap,plot=FALSE,
@@ -229,7 +229,7 @@ sunfish.densityMap
 load("sunfish.densityMap.rda")
 sunfish.densityMap
 ```
-```{r densityMap, fig.cap="Posterior probability density of each of the two character levels, piscivory and non-piscivory, based on stochastic character mapping, graphed along the edges of a tree of centrarchid fishes using a color gradient. See main text for more details.", out.width = "100%"}
+```{r fig04-densityMap, fig.cap="Posterior probability density of each of the two character levels, piscivory and non-piscivory, based on stochastic character mapping, graphed along the edges of a tree of centrarchid fishes using a color gradient. See main text for more details.", out.width = "100%"}
 sunfish.densityMap<-setMap(sunfish.densityMap,
   viridisLite::viridis(n=10))
 plot(sunfish.densityMap,lwd=3,outline=TRUE,
@@ -242,9 +242,9 @@ Apart from the analyses shown, stochastic mapping as implemented in *phytools* i
 
 ## The polymorphic trait evolution model
 
-Another important, but much more recently-added, tool in the *phytools* R package is a method (called `fitpolyMk`) that's designed to fit a discrete character evolution model to trait data containing intraspecific polymorphism [@Revell2022-book]. In this case, our model is one in which an evolutionary transition from (say) character state *a* to character state *b* must first pass through the intermediate polymorphic condition of *a* + *b*. This model starts off very simply -- but will become increasingly complicated for increasing numbers of monomorphic conditions of our trait. Not only that, but as soon as we have more than two monomorphic states, we must also consider whether our character is evolving in an ordered (Figure \@ref(fig:structure-polyMk)a) or unordered (Figure \@ref(fig:structure-polyMk)b) fashion [@Revell2022-book]. Figure \@ref(fig:structure-polyMk) shows the general structure of an ordered and unordered polymorphic trait evolution model -- both for the same, underlying number of monomorphic conditions of our trait (four).
+Another important, but much more recently-added, tool in the *phytools* R package is a method (called `fitpolyMk`) that's designed to fit a discrete character evolution model to trait data containing intraspecific polymorphism [@Revell2022-book]. In this case, our model is one in which an evolutionary transition from (say) character state *a* to character state *b* must first pass through the intermediate polymorphic condition of *a* + *b*. This model starts off very simply -- but will become increasingly complicated for increasing numbers of monomorphic conditions of our trait. Not only that, but as soon as we have more than two monomorphic states, we must also consider whether our character is evolving in an ordered (Figure \@ref(fig:fig05-structure-polyMk)a) or unordered (Figure \@ref(fig:fig05-structure-polyMk)b) fashion [@Revell2022-book]. Figure \@ref(fig:fig05-structure-polyMk) shows the general structure of an ordered and unordered polymorphic trait evolution model -- both for the same, underlying number of monomorphic conditions of our trait (four).
 
-```{r structure-polyMk, fig.cap="Example structures of two alternative polymorphic trait evolution models for characters with four monomorphic conditions: a) an ordered model with states 0 to 3; b) an unordered model, with states \\textit{a}, \\textit{b}, \\textit{c}, and \\textit{d}. The maximum parameter complexity of each model corresponds to 2 $\\times$ the number of double-ended arrows in the panel. See main text for additional details.",fig.height=3, out.width = "100%"}
+```{r fig05-structure-polyMk, fig.cap="Example structures of two alternative polymorphic trait evolution models for characters with four monomorphic conditions: a) an ordered model with states 0 to 3; b) an unordered model, with states \\textit{a}, \\textit{b}, \\textit{c}, and \\textit{d}. The maximum parameter complexity of each model corresponds to 2 $\\times$ the number of double-ended arrows in the panel. See main text for additional details.",fig.height=3, out.width = "100%"}
 par(mfrow=c(1,2))
 graph.polyMk(k=4,ordered=TRUE,states=0:3,
   mar=rep(0.1,4))
@@ -326,7 +326,7 @@ butterfly.ER_unordered<-fitpolyMk(butterfly.tree,
 
 By default, `fitpolyMk` begins by printing out the design matrix of the model for us to verify. The design matrix is of dimensions dictated by the number of states and polymorphic conditions of our character, with integers populating the different types of transitions, from row to column, that should be permitted under our model -- and zeros indicating disallowed transition types. The specific integer values don't mean anything; however, different integer values imply that the corresponding transitions will be allowed to take place with different rates under our model.
 
-This can be helpful, because we should find that it corresponds with the design matrix that was discussed under the simpler M*k* model of the previous section -- as well as with the graphed models of Figure \@ref(fig:structure-polyMk). If we don't want the design matrix to print, though, we can turn off this behavior simply by setting the optional argument `quiet=TRUE`. Let's do that for our remaining two unordered models.
+This can be helpful, because we should find that it corresponds with the design matrix that was discussed under the simpler M*k* model of the previous section -- as well as with the graphed models of Figure \@ref(fig:fig05-structure-polyMk). If we don't want the design matrix to print, though, we can turn off this behavior simply by setting the optional argument `quiet=TRUE`. Let's do that for our remaining two unordered models.
 
 ```{r, echo=FALSE}
 load("butterfly.fitted_models.rda")
@@ -386,9 +386,9 @@ butterfly.aov<-anova(butterfly.ER_ordered,
 
 A quick word of caution to readers is probably merited here. These models can be quite difficult to optimize, meaning that it's not inconceivable to imagine that (in spite of our best efforts) `fitpolyMk` hasn't converged on the true Maximum Likelihood solution for one model or another. Although the true best solution may be unknowable (this is why we use numerical optimization to try and ascertain it), common sense can be a valuable defense against very obvious failures of optimization. For instance, had we found that the most complex model (in our case, `butterfly.ARD_unordered`) had a lower likelihood than any of its nested counterparts (for instance, `butterfly.ARD_ordered`), this would give us very strong cause to believe that one or both models hadn't converged, and that we should perhaps try different random starts or alternative optimization routines to try to find better solutions!
 
-Nonetheless, taking our fitted models at face value, model comparison shows that (among the models in our set) the best supported by far (accounting for parameter complexity) is the ordered, all-rates-different model. *phytools* has a function to graph this model, so let's go ahead and use it!
+Nonetheless, taking our fitted models at face value, model comparison shows that (among the models in our set) the best supported by far (accounting for parameter complexity) is the ordered, all-rates-different model. *phytools* has a function to graph this model, so let's go ahead and use it (Figure \@ref(fig:fig06-ordered-ard-fitpolyMk))!
 
-```{r ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies. Data and phylogeny are from Halali et al. (2020). See main text for more details.",fig.height=3, out.width = "100%"}
+```{r fig06-ordered-ard-fitpolyMk, fig.cap="Best-fitting polymorphic trait evolution model for the evolution of habitat use in Mycalesina butterflies. Data and phylogeny are from Halali et al. (2020). See main text for more details.",fig.height=3, out.width = "100%"}
 plot(butterfly.ARD_ordered,asp=0.65,mar=rep(0.1,4),
   cex.traits=0.8)
 legend("bottomleft",legend=c(paste("log(L) =",
@@ -414,9 +414,9 @@ Now that we have our stochastically mapped trees, let's compute a summary, just 
 butterfly.summary<-summary(butterfly.simmap)
 ```
 
-Much as we saw earlier, the object from our generic `summary` call can be conveniently plotted using *phytools*. In this case, rather than using the *viridis* palette we saw earlier, I'll use the base graphics function `rgb` to attempt to select colors for plotting that are evenly spaced in a red-green-blue color space in which the "corners" (red, green, and blue) correspond to the three monomorphic states of our data. Does that make sense? I'm colorblind, so it's hard for me to be sure how the `rgb` color space captures the "intermediacy" of the polymorphic conditions between the corresponding monomorphic states. Nonetheless, I hope the reader can use this demonstration as an *example* of how to specify custom palettes, rathern than an endorsement of a specific palette!
+Much as we saw earlier, the object from our generic `summary` call can be conveniently plotted using *phytools*. In this case, rather than using the *viridis* palette we saw earlier, I'll use the base graphics function `rgb` to attempt to select colors for plotting that are evenly spaced in a red-green-blue color space in which the "corners" (red, green, and blue) correspond to the three monomorphic states of our data. Does that make sense? I'm colorblind, so it's hard for me to be sure how the `rgb` color space captures the "intermediacy" of the polymorphic conditions between the corresponding monomorphic states. Nonetheless, I hope the reader can use this demonstration as an *example* of how to specify custom palettes, rather than an endorsement of a specific palette!
 
-```{r anc-fitpolyMk, fig.cap="Posterior probabilities of monomorphic or polymorphic conditions at internal nodes from stochastic mapping under an ordered, ARD polymorphic model of trait evolution. Data and phylogeny are from Halali et al. (2020).  The horizontal axis is in millions of years before the present. See main text for additional details.",fig.width=9, out.width = "100%"}
+```{r fig07-anc-fitpolyMk, fig.cap="Posterior probabilities of monomorphic or polymorphic conditions at internal nodes from stochastic mapping under an ordered, ARD polymorphic model of trait evolution. Data and phylogeny are from Halali et al. (2020).  The horizontal axis is in millions of years before the present. See main text for additional details.",fig.width=9, out.width = "100%"}
 hab.cols<-setNames(c(rgb(0,1,0),rgb(0,0.5,0.5),
   rgb(1/3,1/3,1/3),rgb(0,0,1),rgb(0.5,0.5,0),
   rgb(1,0,0)),levels(butterfly.habitat))
@@ -434,11 +434,11 @@ axis(1,pos=-1,at=-h+seq(0,h,by=5)-0.4*h,
   labels=seq(0,h,by=5),cex.axis=0.8)
 ```
 
-Excellent! Figure \@ref(fig:anc-fitpolyMk) shows both the observed (at the tips) and reconstructed (at the internal nodes) marginal posterior probabilities for each of our states and polymorphic conditions.
+Excellent! Figure \@ref(fig:fig07-anc-fitpolyMk) shows both the observed (at the tips) and reconstructed (at the internal nodes) marginal posterior probabilities for each of our states and polymorphic conditions.
 
-Lastly, let's graph the posterior distribution of the accumulation of lineages in each state over time, using the *phytools* function `ltt` as follows. We can even do this while retaining the same color palette as we used for Figure \@ref(fig:anc-fitpolyMk). (We'll learn more about `ltt` in a subsequent section.) The resultant plot in Figure \@ref(fig:ltt-fitpolyMk) simultaneously shows not only the accumulation of lineages in each mono- or polymorphic state, but also the variation attributable to uncertainty in the evolutionary history of our group from our stochastic character maps! Even though Figure \@ref(fig:ltt-fitpolyMk) looks very cool -- to be fair, this type of graph is only especially meaningful for the situation in which the taxa of our phylogeny have been completely or close to completely sampled. In this example, we have around 85\% of described species for the group [@Halali2020] -- a high enough sampling fraction, perhaps, to make this plot meaningful. Sampling fractions in phylogenetic comparative biology, however, are often much lower!
+Lastly, let's graph the posterior distribution of the accumulation of lineages in each state over time, using the *phytools* function `ltt` as follows. We can even do this while retaining the same color palette as we used for Figure \@ref(fig:fig07-anc-fitpolyMk). (We'll learn more about `ltt` in a subsequent section.) The resultant plot in Figure \@ref(fig:fig08-ltt-fitpolyMk) simultaneously shows not only the accumulation of lineages in each mono- or polymorphic state, but also the variation attributable to uncertainty in the evolutionary history of our group from our stochastic character maps! Even though Figure \@ref(fig:fig08-ltt-fitpolyMk) looks very cool -- to be fair, this type of graph is only especially meaningful for the situation in which the taxa of our phylogeny have been completely or close to completely sampled. In this example, we have around 85\% of described species for the group [@Halali2020] -- a high enough sampling fraction, perhaps, to make this plot meaningful. Sampling fractions in phylogenetic comparative biology, however, are often much lower!
 
-```{r ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps. Data and phylogeny are from Halali et al. (2020). See main text for additional details.",fig.height=4, out.width = "100%"}
+```{r fig08-ltt-fitpolyMk, fig.cap="Lineage-through-time plot showing the reconstructed accumulation of lineages in each polymorphic condition or monomorphic state over time, from 100 stochastic character maps. Data and phylogeny are from Halali et al. (2020). See main text for additional details.",fig.height=4, out.width = "100%"}
 butterfly.ltt<-ltt(butterfly.simmap)
 par(mar=c(4.1,4.1,1.1,1.1))
 plot(butterfly.ltt,show.total=FALSE,bty="n",las=1,
@@ -504,7 +504,7 @@ Let's review our fitted model.
 liolaemid.hrm
 ```
 
-The structure of the transition matrix **Q** ought to match our design matrix in that optimized transition rates should *only* be found in matrix cells populated by non-zero integers in our printed design. [Except for the matrix diagonal which always contains a value equal to the negative row sum, @OMeara2012; @Revell2022-book.] Here we see that it does -- although some Maximum Likelihood transition rate values, such as the transition rate from `O` (the labile condition of oviparity) to `O*` (the inert condition) are not different from zero in the fitted model (also see Figure \@ref(fig:anc-fitHRM)).
+The structure of the transition matrix **Q** ought to match our design matrix in that optimized transition rates should *only* be found in matrix cells populated by non-zero integers in our printed design. [Except for the matrix diagonal which always contains a value equal to the negative row sum, @OMeara2012; @Revell2022-book.] Here we see that it does -- although some Maximum Likelihood transition rate values, such as the transition rate from `O` (the labile condition of oviparity) to `O*` (the inert condition) are not different from zero in the fitted model (also see Figure \@ref(fig:fig09-anc-fitHRM)).
 
 A conventional analysis workflow would typically involve comparing this fitted model to a standard M*k* model [discussed above, also see @Harmon2019-on], as well as, perhaps, other variants of the hidden-rates model [@Beaulieu2013-zo; @Revell2022-book]. Here, I'll compare our umbral model to both a standard extended M*k* model with different backward and forward rates of transitions (the `"ARD"` model), as well as to a slightly more complex hidden-rates model in which transitions *are* allowed between the hidden condition levels, just at different rates. We could fit the M*k* model using the *phytools* function `fitMk`, as we did earlier -- but here I'll do it using `fitHRM` by setting `ncat` (the number of rate categories for each level of the trait) to `ncat=1`. This also helps us see that standard M*k* models are special cases of the hidden-rates model -- just without hidden rate categories!
 
@@ -531,9 +531,9 @@ liolaemid.hrm_asr<-ancr(liolaemid.hrm,tips=TRUE)
 print(liolaemid.hrm_asr,printlen=12)
 ```
 
-Lastly, this marginal ancestral state reconstruction can easily be plotted on the tree using a *phytools* `plot` method for the object class. Here, just for fun, I've also inset a visualization of our fitted umbral hidden-rates model. We can see from this best-supported model that although the observed condition of parity mode may not satisfy Dollo's Law [@Lee1998] in liolaemid lizards, under the umbral model parity mode evolution *does* appear to have a hidden, absorbing (i.e., irreversible) viviparous condition (Figure \@ref(fig:anc-fitHRM)), from which oviparous reproductive mode can no longer re-evolve.
+Lastly, this marginal ancestral state reconstruction can easily be plotted on the tree using a *phytools* `plot` method for the object class. Here, just for fun, I've also inset a visualization of our fitted umbral hidden-rates model. We can see from this best-supported model that although the observed condition of parity mode may not satisfy Dollo's Law [@Lee1998] in liolaemid lizards, under the umbral model parity mode evolution *does* appear to have a hidden, absorbing (i.e., irreversible) viviparous condition (Figure \@ref(fig:fig09-anc-fitHRM)), from which oviparous reproductive mode can no longer re-evolve.
 
-```{r anc-fitHRM, fig.width=10, fig.height=5, fig.cap="Marginal ancestral state reconstruction of parity mode (oviparity vs. viviparity) in liolaemid lizards under the hidden-rates model. Phylogeny and data based on Esquerr\\'e et al. (2019). Inset panel shows best-supported hidden-rates model. See main text for additional details.",out.width = "100%"}
+```{r fig09-anc-fitHRM, fig.width=10, fig.height=5, fig.cap="Marginal ancestral state reconstruction of parity mode (oviparity vs. viviparity) in liolaemid lizards under the hidden-rates model. Phylogeny and data based on Esquerr\\'e et al. (2019). Inset panel shows best-supported hidden-rates model. See main text for additional details.",out.width = "100%"}
 cols<-setNames(c("#FFE5B4","#F0EAD6","#E97451",
   "#880808"),colnames(liolaemid.hrm_asr$ace))
 plot(liolaemid.hrm_asr,legend=FALSE,
@@ -596,9 +596,9 @@ eel.Pagel_lambda
 
 This result tells us that we've found significant phylogenetic signal in our trait by both measures. Although *K* and $\lambda$ tend to be correlated, it's entirely possible that we could've found significant *K* and non-significant $\lambda$, or vice versa. This is not a contradiction. The concept of phylogenetic signal is one of phenotypic similarity among related species -- but *K* and $\lambda$ measure this concept via two entirely different procedures!
 
-Along with the simple calculation of phylogenetic signal, *phytools* also contains several methods to visualize our results. In particular, for Blomberg et al.'s *K* we can plot the permutation distribution of *K* alongside our observed measure. For Pagel's $\lambda$, we can plot the likelihood surface, our Maximum Likelihood solution, and the likelihood of $\lambda$ = 0: the null hypothesis of our statistical tests. Both of these plots are illustrated in Figure \@ref(fig:phylosig) for our eel body length data.
+Along with the simple calculation of phylogenetic signal, *phytools* also contains several methods to visualize our results. In particular, for Blomberg et al.'s *K* we can plot the permutation distribution of *K* alongside our observed measure. For Pagel's $\lambda$, we can plot the likelihood surface, our Maximum Likelihood solution, and the likelihood of $\lambda$ = 0: the null hypothesis of our statistical tests. Both of these plots are illustrated in Figure \@ref(fig:fig10-phylosig) for our eel body length data.
 
-```{r phylosig, fig.cap="a) Blomberg et al. (2003) measured value of the \\textit{K} statistic for phylogenetic signal, compared to a null distribution of \\textit{K} obtained via randomization. b) Pagel's (1999) $\\lambda$ statistic for phylogenetic signal, also showing the likelihood surface. Data consist of maximum body length (on a log scale) from 61 species of elopomorph eels (Collar et al. 2014). See main text for additional details.",fig.width=9, out.width = "100%"}
+```{r fig10-phylosig, fig.cap="a) Blomberg et al. (2003) measured value of the \\textit{K} statistic for phylogenetic signal, compared to a null distribution of \\textit{K} obtained via randomization. b) Pagel's (1999) $\\lambda$ statistic for phylogenetic signal, also showing the likelihood surface. Data consist of maximum body length (on a log scale) from 61 species of elopomorph eels (Collar et al. 2014). See main text for additional details.",fig.width=9, out.width = "100%"}
 par(mfrow=c(1,2),cex=0.9)
 plot(eel.Blomberg_K,las=1,cex.axis=0.9)
 mtext("a)",adj=0,line=1)
@@ -684,7 +684,7 @@ cordylid.ace<-summary(cordylid.mcmc)
 
 Now that we've obtained our estimated Bayesian ancestral states for internal nodes, it's a straightforward task to visualize them on the branches and nodes of the tree. For this undertaking we'll use the popular *phytools* plotting function `contMap` [@Revell2013-ij]. By default, `contMap` uses Maximum Likelihood to compute ancestral states at all of the internal nodes of the tree -- but it can also be supplied with user-specified values. Since we want to use our Bayesian estimates from `anc.Bayes`, that's what we'll do here.
 
-```{r cordylid-ace, fig.cap="Reconstructed ancestral values from Bayesian MCMC projected onto the nodes and edges of the tree. Numerical values at internal nodes are node indices from our input phylogeny. Data consist of PC 1 from a phylogenetic principal components analysis of cordylid morphological traits, and separate highly armored (high values) from lightly armored (low values) lizards (Broeckhoven et al. 2016). See main text for more details.",fig.height=3.5, out.width = "100%"}
+```{r fig11-cordylid-ace, fig.cap="Reconstructed ancestral values from Bayesian MCMC projected onto the nodes and edges of the tree. Numerical values at internal nodes are node indices from our input phylogeny. Data consist of PC 1 from a phylogenetic principal components analysis of cordylid morphological traits, and separate highly armored (high values) from lightly armored (low values) lizards (Broeckhoven et al. 2016). See main text for more details.",fig.height=3.5, out.width = "100%"}
 cordylid.contMap<-contMap(cordylid.tree,
   cordylid.armor_score,anc.states=cordylid.ace,
   plot=FALSE)
@@ -695,15 +695,15 @@ plot(cordylid.contMap,ftype="i",fsize=c(0.6,0.7),
 nodelabels(frame="circle",bg="white",cex=0.6)
 ```
 
-For fun, compare Figure \@ref(fig:cordylid-ace) to Figure 2 of Broeckhoven et al. in which estimated ancestral state values were assigned to each branch using a similar color gradient!
+For fun, compare Figure \@ref(fig:fig11-cordylid-ace) to Figure 2 of Broeckhoven et al. in which estimated ancestral state values were assigned to each branch using a similar color gradient!
 
-In addition to this simple analysis, we can (naturally) extract and plot posterior probability densities from any of our internal nodes of the tree. To see this, let's focus on the node labeled "49" in Figure \@ref(fig:cordylid-ace) and do exactly that. Node 49 corresponds to the common ancestor of the *Pseudocordylus* clade. The *Pseudocordylus* are among the most lightly all cordylid lizards in this analysis, so we'd expect our posterior distribution for this node to be centered on a relatively low value of our armor score.
+In addition to this simple analysis, we can (naturally) extract and plot posterior probability densities from any of our internal nodes of the tree. To see this, let's focus on the node labeled "49" in Figure \@ref(fig:fig11-cordylid-ace) and do exactly that. Node 49 corresponds to the common ancestor of the *Pseudocordylus* clade. The *Pseudocordylus* are among the most lightly all cordylid lizards in this analysis, so we'd expect our posterior distribution for this node to be centered on a relatively low value of our armor score.
 
 ```{r}
 cordylid.node49<-density(cordylid.mcmc,what=49)
 cordylid.node49
 ```
-```{r cordylid-pd, fig.cap="Posterior probability density at node 49 of Figure 10 from Bayesian MCMC ancestral state reconstruction of PC 1 from a morphological analysis on a phylogenetic tree of cordylid lizards. Node 49 corresponds to the common ancestor of the \\textit{Pseudocordylus}: a relatively lightly armored cordylid clade. See main text for more details.",fig.height=3.5, out.width = "100%"}
+```{r fig12-cordylid-pd, fig.cap="Posterior probability density at node 49 of Figure 11 from Bayesian MCMC ancestral state reconstruction of PC 1 from a morphological analysis on a phylogenetic tree of cordylid lizards. Node 49 corresponds to the common ancestor of the \\textit{Pseudocordylus}: a relatively lightly armored cordylid clade. See main text for more details.",fig.height=3.5, out.width = "100%"}
 par(mar=c(5.1,4.1,1.1,2.1))
 plot(cordylid.node49,las=1,bty="n",main="",cex.lab=0.8,
   cex.axis=0.7,xlab="PC 1 (increasing armor)",
@@ -711,7 +711,7 @@ plot(cordylid.node49,las=1,bty="n",main="",cex.lab=0.8,
   xlim=range(cordylid.armor_score))
 ```
 
-Figure \@ref(fig:cordylid-pd) shows our estimate of the posterior probability distribution of the ancestral node 49 state, and should be centered precisely on the value we projected onto the tree of Figure \@ref(fig:cordylid-ace)!
+Figure \@ref(fig:fig12-cordylid-pd) shows our estimate of the posterior probability distribution of the ancestral node 49 state, and should be centered precisely on the value we projected onto the tree of Figure \@ref(fig:fig11-cordylid-ace)!
 
 As given here, Bayesian MCMC ancestral state reconstruction will yield (in nearly all circumstances) point estimates that are highly similar to the values that we might have obtained using Maximum Likelihood. Nonetheless, Bayesian inference provides the additional benefit of supplying a natural framework for incorporating prior information about the states at one or various internal nodes in the tree (by adjusting `pr.mean`, `pr.var`, or both: see above), as well as for measuring the substantial uncertainty that can be associated with ancestral trait estimates (in particular, by providing not just confidence intervals around each node, but sets of ancestral values across *all* nodes of the tree that have been sampled in proportion to their posterior probability under the model).
 
@@ -745,9 +745,9 @@ tropidurid.tree<-mergeMappedStates(tropidurid.tree,
   "rock","rock-dwelling")
 ```
 
-Let's plot this updated tree. To do so, I'm going to use the recent *phytools* function `sigmoidPhylogram` that will plot our tree using curved ("sigmoidal") linking lines. (*phytools* contains lots of cool tree plotting functions like this one!)
+Let's plot this updated tree. To do so, I'm going to use the recent *phytools* function `sigmoidPhylogram` that will plot our tree using curved ("sigmoidal") linking lines (Figure \@ref(fig:fig13-trop-tree)). *phytools* contains lots of cool tree plotting functions like this one!
 
-```{r trop-tree, fig.cap="Phylogenetic tree of rock- and non-rock dwelling tropidurid lizard species from Revell et al. (2022). Mapped colors correspond to a hypothesis of the history of habitat use across the clade. See main text for more details.",fig.height=3.5, out.width = "100%"}
+```{r fig13-trop-tree, fig.cap="Phylogenetic tree of rock- and non-rock dwelling tropidurid lizard species from Revell et al. (2022). Mapped colors correspond to a hypothesis of the history of habitat use across the clade. See main text for more details.",fig.height=3.5, out.width = "100%"}
 cols<-setNames(c("white","black"),c("non-rock dwelling",
   "rock-dwelling"))
 sigmoidPhylogram(tropidurid.tree,direction="upwards",
@@ -815,9 +815,9 @@ A number of approaches, such as cross-validation [e.g., @Efron1983-al], have bee
 
 Before continuing, however, we'll try to get a better sense of our data by creating a simple projection of our phenotypic trait (log skull length) onto the tree. Visual inspection may help give us a preliminary sense of where in our tree our penalized likelihood method could end up showing the rate of primate skull length evolution to vary the most -- and the least. In this case, I'll use two different plotting methods.
 
-First, I'll use the *phytools* function `edge.widthMap` which sizes the thickness of our plotted branches in proportion to the observed or reconstructed trait values. (This is one of my favorite *phytools* functions, but, compared to the `contMap` method we saw earlier, so far as I can tell it's been used very little in published literature!) We can see the result in Figure \@ref(fig:primate-edgewidth)a. In addition to this visualization, I'll also undertake a simple projection our phylogeny into the trait space. This is done using a very popular *phytools* plotting method called `phenogram` [@Evans2009-gk; @Revell2013-ij; @Revell2014-chapter]. In the typical style of this kind of plot, our phylogeny is graphed in a space defined by time since the root of the tree (on our horizontal axis), and the observed or reconstructed values of our phenotypic trait [on the vertical, @Revell2013-ij]. The result of this projection is shown in Figure \@ref(fig:primate-edgewidth)b.
+First, I'll use the *phytools* function `edge.widthMap` which sizes the thickness of our plotted branches in proportion to the observed or reconstructed trait values. (This is one of my favorite *phytools* functions, but, compared to the `contMap` method we saw earlier, so far as I can tell it's been used very little in published literature!) We can see the result in Figure \@ref(fig:fig14-primate-edgewidth)a. In addition to this visualization, I'll also undertake a simple projection our phylogeny into the trait space. This is done using a very popular *phytools* plotting method called `phenogram` [@Evans2009-gk; @Revell2013-ij; @Revell2014-chapter]. In the typical style of this kind of plot, our phylogeny is graphed in a space defined by time since the root of the tree (on our horizontal axis), and the observed or reconstructed values of our phenotypic trait [on the vertical, @Revell2013-ij]. The result of this projection is shown in Figure \@ref(fig:fig14-primate-edgewidth)b.
 
-```{r primate-edgewidth, fig.cap="a) Primate skull lengths (on a log scale) projected onto the edges and nodes of the phylogeny. The width of each edge of the tree is proportional to the observed or reconstructed value of the trait. See main text for more details. b) A projection of the phylogeny of a) into a space defined by time since the root (on the horizontal axis) and log skull length. Phylogeny and data are derived from Kirk and Kay (2004). See main text for more details.", fig.width=11, fig.height=9.5, out.width = "100%"}
+```{r fig14-primate-edgewidth, fig.cap="a) Primate skull lengths (on a log scale) projected onto the edges and nodes of the phylogeny. The width of each edge of the tree is proportional to the observed or reconstructed value of the trait. See main text for more details. b) A projection of the phylogeny of a) into a space defined by time since the root (on the horizontal axis) and log skull length. Phylogeny and data are derived from Kirk and Kay (2004). See main text for more details.", fig.width=11, fig.height=9.5, out.width = "100%"}
 par(mfrow=c(1,2))
 primate.widthMap<-edge.widthMap(primate.tree,
   primate.lnSkull)
@@ -861,7 +861,7 @@ primate.mBM_10<-multirateBM(primate.tree,
 
 Finally, let's visualize the differences and similarities between each of our three fitted models.
 
-```{r multirateBM, fig.cap="Estimated rates of log(skull length) evolution in primates under a variable-rate Brownian evolution model for different values of the smoothing parameter, $\\lambda$. Increasing values of $\\lambda$ should correspond to less variation in the rate of evolution across the tree. Phylogeny and data are based on Kirk and Kay (2004). See main text for additional details.",fig.width=10, out.width = "100%"}
+```{r fig15-multirateBM, fig.cap="Estimated rates of log(skull length) evolution in primates under a variable-rate Brownian evolution model for different values of the smoothing parameter, $\\lambda$. Increasing values of $\\lambda$ should correspond to less variation in the rate of evolution across the tree. Phylogeny and data are based on Kirk and Kay (2004). See main text for additional details.",fig.width=10, out.width = "100%"}
 par(mfrow=c(1,3))
 plot(primate.mBM_1,ftype="off",lwd=2,
   mar=c(0.1,0.1,2.1,0.1))
@@ -877,7 +877,7 @@ mtext(expression(paste("c) ",lambda," = 10")),adj=0.1,
   line=0.5,cex=1.1)
 ```
 
-We can see from the plot of Figure \@ref(fig:multirateBM) that even though the specific range of rate variation depends strongly on our specified values of $\lambda$, the pattern from clade to clade on the tree is relatively robust. This should give us some measure of confidence that the our inferred rate heterogeneity may be a product of real variability in the evolutionary rate for our character on the phylogeny!
+We can see from the plot of Figure \@ref(fig:fig15-multirateBM) that even though the specific range of rate variation depends strongly on our specified values of $\lambda$, the pattern from clade to clade on the tree is relatively robust. This should give us some measure of confidence that the our inferred rate heterogeneity may be a product of real variability in the evolutionary rate for our character on the phylogeny!
 
 # Diversification
 
@@ -907,7 +907,7 @@ From the print-out we see that in addition to the tree and the lineages through 
 
 To proceed and graph our object created in the previous step, we merely need to execute a generic `plot` method function call as follows. A simple `plot` call would have done the trick; however, in this case I decided to first leave off the axes of my plot, and then re-plot them so that I could make our horizontal (*x*) axis run *backwards* in time (i.e., right to left) from the present day into the past. I've also super-imposed the phylogeny itself on our plot so that we can more easily visualization the relationship between the structure of our phylogenetic tree and the accumulation of lineages over time.
 
-```{r elap-ltt, fig.cap="Lineage through time plot for phylogeny of snakes from the family Elapidae (Lee et al. 2016). See main text for more details.",fig.height=4, out.width = "100%"}
+```{r fig16-elap-ltt, fig.cap="Lineage through time plot for phylogeny of snakes from the family Elapidae (Lee et al. 2016). See main text for more details.",fig.height=4, out.width = "100%"}
 par(mar=c(5.1,4.1,1.1,2.1))
 plot(elapidae.ltt,show.tree=TRUE,lwd=2,
   log.lineages=FALSE,log="y",bty="n",cex.lab=0.9,
@@ -919,7 +919,7 @@ axis(1,at=h-seq(0,35,by=5),labels=seq(0,35,by=5),las=1,
 axis(2,las=1,cex.axis=0.8)
 ```
 
-In general, accounting for incomplete taxon sampling in the measurement of the $\gamma$ statistic is important because missing taxa will tend to pull our lineage-through-time curve downwards as we approach the tips of the tree -- in other words, towards more negative values of $\gamma$, just like the value that we see for our lineage through time plot of Figure \@ref(fig:elap-ltt).
+In general, accounting for incomplete taxon sampling in the measurement of the $\gamma$ statistic is important because missing taxa will tend to pull our lineage-through-time curve downwards as we approach the tips of the tree -- in other words, towards more negative values of $\gamma$, just like the value that we see for our lineage through time plot of Figure \@ref(fig:fig16-elap-ltt).
 
 Fortunately, there's a simple way to address this bias. If we know the *true* species richness of our clade of interest, we can simply simulate trees that match this richness under pure-birth, randomly prune taxa to the level of "missingness" in our reconstructed tree, and then use the distribution of $\gamma$ values across this set of simulated (and then randomly pruned) trees as our null distribution for hypothesis testing! This exact procedure is called the "Monte Carlo constant rates" [MCCR, @Pybus2000-sf] test and is implemented in the *phytools* function `mccr`.
 
@@ -936,13 +936,13 @@ elapidae.mccr
 
 This tells us that, having accounted for missing taxa, our observed value of $\gamma$ (previously highly significantly negative) becomes indistinguishable from what we'd expect under pure-birth. We can plot our results to see what I mean.
 
-```{r liol-mccr, fig.cap="Distribution of simulated values of $\\gamma$ for the MCCR test, and observed value for the lineage through time curve of the phylogeny of elapid snakes given in Figure 15. Phylogenetic tree based on Lee et al. (2016). See main text for more details.",fig.height=3.5, out.width = "100%"}
+```{r fig17-elap-mccr, fig.cap="Distribution of simulated values of $\\gamma$ for the MCCR test, and observed value for the lineage through time curve of the phylogeny of elapid snakes given in Figure 16. Phylogenetic tree based on Lee et al. (2016). See main text for more details.",fig.height=3.5, out.width = "100%"}
 par(mar=c(5.1,4.1,0.6,2.1))
 plot(elapidae.mccr,las=1,cex.lab=0.8,cex.axis=0.7,
   main="")
 ```
 
-Figure \@ref(fig:liol-mccr) shows that the measured value of $\gamma$ by the MCCR test is no longer significant, demonstrating the vital importance of accounting for incomplete taxon sampling in this (and other) diversification analyses using phylogenies.
+Figure \@ref(fig:fig17-elap-mccr) shows that the measured value of $\gamma$ by the MCCR test is no longer significant, demonstrating the vital importance of accounting for incomplete taxon sampling in this (and other) diversification analyses using phylogenies.
 
 ## Modeling speciation and extinction
 
@@ -980,7 +980,7 @@ This result tells us that, in the context of the two very simple models that we'
 
 Lastly, the *phytools* function `fit.bd` exports a likelihood function as part of the fitted model object. This, in turn, makes it very straightforward for *phytools* users to (for example) compute and graph the likelihood surface. Here, I'll illustrate this using the base R graphics function `persp`. (But R and contributed R packages contain lots of even fancier 3D plotting methods that readers might be more interested in trying!)
 
-```{r liol-bd-3d, fig.cap="Visualization of the likelihood surface for speciation and extinction rates estimated for a phylogenetic tree of Liolaemidae. The ridge of values with similar likelihoods is typical of this class of model. Phylogenetic tree from Esquerr\\'e et al. (2019). See main text for more details.", out.width = "100%"}
+```{r fig18-liol-bd-3d, fig.cap="Visualization of the likelihood surface for speciation and extinction rates estimated for a phylogenetic tree of Liolaemidae. The ridge of values with similar likelihoods is typical of this class of model. Phylogenetic tree from Esquerr\\'e et al. (2019). See main text for more details.", out.width = "100%"}
 ngrid<-40
 b<-seq(0.25,0.45,length.out=ngrid)
 d<-seq(0.10,0.25,length.out=ngrid)
@@ -996,11 +996,11 @@ persp(b,d,exp(logL),shade=0.3,phi=45,theta=20,
 
 Some astute readers will notice the line `logL[is.nan(logL)]` `<-` `min(...)` (etc.) in my script of above. This is because during our grid evaluation of the likelihood function, sometimes the function was being evaluated in parameter space where the likelihood is not defined. To account for this I set all parts of the likelihood surface that could not be computed to the numerical minimum of the graph!
 
-Figure \@ref(fig:liol-bd-3d) shows the very strong *ridge* in the likelihood surface (from low $\lambda$ and low $\mu$, to high $\lambda$ and high $\mu$) that almost invariably tends to characterize the likelihood surfaces of birth-death models.
+Figure \@ref(fig:fig18-liol-bd-3d) shows the very strong *ridge* in the likelihood surface (from low $\lambda$ and low $\mu$, to high $\lambda$ and high $\mu$) that almost invariably tends to characterize the likelihood surfaces of birth-death models.
 
 # Visualization
 
-After phylogenetic comparative analysis, *phytools* is perhaps best known for its phylogeny visualization methods, and we've seen a number of these approaches already deployed throughout this article. For example, in Figures \@ref(fig:simmap-trees), \@ref(fig:posterior-probs), \@ref(fig:num-changes), \@ref(fig:densityMap), \@ref(fig:anc-fitpolyMk), and \@ref(fig:trop-tree) I illustrated custom *phytools* plotting methods for stochastic character mapping and the analysis of stochastically mapped trees. Likewise, in Figures \@ref(fig:structure-polyMk), \@ref(fig:ordered-ard-fitpolyMk), and \@ref(fig:anc-fitHRM) I demonstrated *phytools* plotting methods for fitted discrete character evolution models. In Figures \@ref(fig:phylosig), \@ref(fig:cordylid-ace), \@ref(fig:primate-edgewidth), and \@ref(fig:multirateBM) I showed a variety of custom methods for visualizing continuous trait evolution. Finally, in Figures \@ref(fig:ltt-fitpolyMk), \@ref(fig:elap-ltt), and \@ref(fig:liol-mccr) I illustrated several different approaches for graphing diversification or the results from an analysis of diversification on the tree. This is a sparse sample of the variety of plotting methods for phylogenies, phylogenetic comparative data, and the results of phylogenetic analysis that are implemented in the *phytools* package. 
+After phylogenetic comparative analysis, *phytools* is perhaps best known for its phylogeny visualization methods, and we've seen a number of these approaches already deployed throughout this article. For example, in Figures \@ref(fig:fig01-simmap-trees), \@ref(fig:fig02-posterior-probs), \@ref(fig:fig03-num-changes), \@ref(fig:fig04-densityMap), \@ref(fig:fig07-anc-fitpolyMk), and \@ref(fig:fig13-trop-tree) I illustrated custom *phytools* plotting methods for stochastic character mapping and the analysis of stochastically mapped trees. Likewise, in Figures \@ref(fig:fig05-structure-polyMk), \@ref(fig:fig06-ordered-ard-fitpolyMk), and \@ref(fig:fig09-anc-fitHRM) I demonstrated *phytools* plotting methods for fitted discrete character evolution models. In Figures \@ref(fig:fig10-phylosig), \@ref(fig:fig11-cordylid-ace), \@ref(fig:fig14-primate-edgewidth), and \@ref(fig:fig15-multirateBM) I showed a variety of custom methods for visualizing continuous trait evolution. Finally, in Figures \@ref(fig:fig08-ltt-fitpolyMk), \@ref(fig:fig16-elap-ltt), and \@ref(fig:fig17-elap-mccr) I illustrated several different approaches for graphing diversification or the results from an analysis of diversification on the tree. This is a sparse sample of the variety of plotting methods for phylogenies, phylogenetic comparative data, and the results of phylogenetic analysis that are implemented in the *phytools* package. 
 
 In this final section, I'll illustrate just a few more popular plotting methods of the package that we haven't already seen in prior bits of the present article.
 
@@ -1049,7 +1049,7 @@ bat.cophylo
 
 To plot it, we'll use the a generic *phytools* `plot` method for the object class. I'll go ahead and adjust a few settings of the method to make our graph look nice -- and I'll use species-specific linking line colors so that we can more easily visualize all the different virus sequences that are associated with each bat host! [My color palette comes from the *RColorBrewer* function `brewer.pal`, @Neuwirth2022. I chose to use *RColorBrewer* here, rather than the *viridis* palette from earlier in the article, because it creates aesthetic *divergent* color palettes -- whereas *viridis* will create a color *gradient*. *RColorBrewer* can be installed from CRAN in the typical way.]
 
-```{r bat-cophylo, fig.cap="Co-phylogenetic plot of bat species (left) and their associated betacoronaviruses (right, labeled by GenBank accession number). Associations and GenBank accession numbers from Caraballo (2022). See main text for more details.", fig.height=3, out.width = "100%"}
+```{r fig19-bat-cophylo, fig.cap="Co-phylogenetic plot of bat species (left) and their associated betacoronaviruses (right, labeled by GenBank accession number). Associations and GenBank accession numbers from Caraballo (2022). See main text for more details.", fig.height=3, out.width = "100%"}
 cols<-setNames(RColorBrewer::brewer.pal(n=7,
   name="Dark2"),bat.tree$tip.label)
 par(lend=3)
@@ -1064,7 +1064,7 @@ tiplabels.cophylo(pie=pies,
   which="left",cex=0.2)
 ```
 
-In general, our plot reveals a surprisingly strong association between the topology of the phylogenies of the bats and their viruses -- a pattern that @Caraballo2022-rd also reported (and that happened to contrast with what Caraballo found for alphacoronaviruses, for what it's worth).
+In general, our plot of Figure \@ref(fig:fig19-bat-cophylo) reveals a surprisingly strong association between the topology of the phylogenies of the bats and their viruses -- a pattern that @Caraballo2022-rd also reported (and that happened to contrast with what Caraballo found for alphacoronaviruses, for what it's worth).
 
 ## Projecting a tree onto a geographic map
 
@@ -1106,17 +1106,17 @@ tortoise.phymap
 
 Finally, we're ready to plot our tree. Here, we must remember to specify the *x* and *y* axis limits (via the arguments `xlim` and `ylim`, respectively) based on the geographic coordinates of our geolocality data.
 
-```{r tortoise-geog, fig.width=8, fig.height=4, fig.cap="A phylogenetic tree of Galapagos tortoises projected onto a geographic map. Phylogenetic data and geographic locality information are based on Poulakakis et al. (2020). See main text for more details.", out.width="100%"}
+```{r fig20-tortoise-geog, fig.width=8, fig.height=4, fig.cap="A phylogenetic tree of Galapagos tortoises projected onto a geographic map. Phylogenetic data and geographic locality information are based on Poulakakis et al. (2020). See main text for more details.", out.width="100%"}
 plot(tortoise.phymap,direction="rightwards",pts=FALSE,
-  xlim=c(-92.25,-89.25),ylim=c(-1.8,0.75),ftype="i",
-  fsize=0.8,lty="dashed",map.bg="#5dbb63")
+  xlim=c(-92.25,-89.25),ylim=c(-1.8,0.75),ftype="i",fsize=0.8,
+  lty="dashed",map.bg="lightgreen",colors="slategrey")
 ```
 
-Although the base map from *mapdata* is sufficiently high resolution for our purposes here, higher resolution maps are available for some regions, and it's even possible to import and use a custom map -- should we be so inclined [e.g., @Quach2019].
+The results can be seen in Figure \@ref(fig:fig20-tortoise-geog). Although the base map from *mapdata* is sufficiently high resolution for our purposes here, higher resolution maps are available for some regions, and it's even possible to import and use a custom map -- should we be so inclined [e.g., @Quach2019].
 
 ## Projecting trees into phenotypic space
 
-Along with projecting a phylogenetic tree onto a geographic map (as we just saw), and projecting traits onto the edges and nodes of a plotted tree, the *phytools* package also contains multiple methods to project a tree into a space defined by our traits. Undoubtedly, the most popular of these are `phylomorphospace`, which projects a tree into a bivariate quantitative trait space [@Sidlauskas2008-mz; e.g., @Friedman2016-cw; @Martins2021-yo], and `phenogram`, which projects a tree into a space defined by time since the root on the horizontal and phenotype on the vertical [typically called a "traitgram," see @Evans2009-gk; e.g., @Martinez2020-to; @Chazot2021-ey]. We saw how `phenogram` works in Figure \@ref(fig:primate-edgewidth)b of any earlier section of this article. Here, I'll focus on the *phytools* method `phylomorphospace`.
+Along with projecting a phylogenetic tree onto a geographic map (as we just saw), and projecting traits onto the edges and nodes of a plotted tree, the *phytools* package also contains multiple methods to project a tree into a space defined by our traits. Undoubtedly, the most popular of these are `phylomorphospace`, which projects a tree into a bivariate quantitative trait space [@Sidlauskas2008-mz; e.g., @Friedman2016-cw; @Martins2021-yo], and `phenogram`, which projects a tree into a space defined by time since the root on the horizontal and phenotype on the vertical [typically called a "traitgram," see @Evans2009-gk; e.g., @Martinez2020-to; @Chazot2021-ey]. We saw how `phenogram` works in Figure \@ref(fig:fig14-primate-edgewidth)b of any earlier section of this article. Here, I'll focus on the *phytools* method `phylomorphospace`.
 
 For this example I'll be using a time-calibrated phylogeny of 11 vertebrate species from the *TimeTree* website [@Hedges2006-go], and a phenotypic trait dataset of body mass (in kg) and mean litter size. (The latter dataset was generated from *Wikipedia* and other sources: i.e., "Googling it.")
 
@@ -1143,7 +1143,7 @@ This gives us a set of reconstructed values on our original (linear) scale, but 
 ```{r, echo=FALSE}
 options(scipen=6)
 ```
-```{r vert-phylomorphospace,fig.cap="Phylomorphospace of body mass and litter size for a selection of vertebrate species. The uderlying phylogenetic tree was obtained from Hedges et al. (2006). See main text for additional details.",fig.height=3.5, out.width = "100%"}
+```{r fig21-vert-phylomorphospace,fig.cap="Phylomorphospace of body mass and litter size for a selection of vertebrate species. The uderlying phylogenetic tree was obtained from Hedges et al. (2006). See main text for additional details.",fig.height=3.5, out.width = "100%"}
 par(mar=c(5.1,4.1,0.6,2.1))
 phylomorphospace(vertebrate.tree,
   vertebrate.data[,c(1,3)],A=vertebrate.ace,log="xy",
@@ -1166,7 +1166,7 @@ legend("topleft",gsub("_"," ",
   pt.bg=cols[ind],cex=0.6,bty="n",text.font=3)
 ```
 
-Here, I chose to graph the projection without taxon labels, then add different colored points and a legend to put the label information back on the plot (sorting my labels alphabetically as I did this). As readers can probably imagine, taxon labels on a phylomorphospace plot can easily become very messy -- particularly for larger trees!
+Here, I chose to graph the projection without taxon labels, then add different colored points and a legend to put the label information back on the plot (sorting my labels alphabetically as I did this). The result can be seen in Figure \@ref(fig:fig21-vert-phylomorphospace). As readers can probably imagine, taxon labels on a phylomorphospace plot can easily become very messy -- particularly for larger trees!
 
 ## Plotting phenotypic data at the tips of the tree
 
@@ -1246,40 +1246,20 @@ head(anole.pc_scores)
 
 Since the sign of each principal component is arbitrary (principal components are vectors), we'll now "flip" the sign of PC 1 -- so that it switches from negative size to simply "size."
 
-```{r, echo=FALSE}
+```{r}
 anole.pc_scores[,1]<--anole.pc_scores[,1]
-```
-```{r, eval=FALSE}
-anole.pc_scores[,1]<--anole.pc_scores[,1]
-head(anole.pc_scores)
-```
-```
-##                    PC1       PC2         PC3       PC4         PC5
-## ahli         0.1747576 0.8697064  1.52379491 1.6029659 -0.23955421
-## allogus     -0.1646585 1.4017806  1.74506491 1.5358005 -0.08089546
-## rubribarbus  0.4925001 1.0413268  1.45866163 1.4180850 -0.05716104
-## imias        1.1608049 0.7514380  0.75822327 1.7127381  0.35013533
-## sagrei       0.3486332 1.2632997 -0.05102313 0.7317455  0.37217463
-## bremeri      0.9714818 0.6943196  0.11689334 0.9290039  0.43486041
-##                    PC6
-## ahli        -0.1626049
-## allogus     -0.1245855
-## rubribarbus -0.1797060
-## imias       -0.1340347
-## sagrei      -0.1484157
-## bremeri     -0.2304513
 ```
 
 Finally, let's graph our results using the `phylo.heatmap` function. Seeing as the variance in our different principal component dimensions are quite different from PC to PC, we'll standardize them to have a constant variance using `standardize=TRUE`. As we've done in other exercises of this article, we can update the default color palette of the plot using the argument `colors`. Here, I'll use the colorblind-friendly viridis color palette from the *viridisLite* package [@Garnier2022] that we learned about earlier.
 
-```{r anole-heatmap, fig.cap="Phylogenetic heatmap showing principal components from a phylogenetic PCA of six morphological traits of \\textit{Anolis} lizards. Tree and data are from Mahler et al. (2010). See main text for additional details.", fig.height=8, out.width = "100%"}
+```{r fig22-anole-heatmap, fig.cap="Phylogenetic heatmap showing principal components from a phylogenetic PCA of six morphological traits of \\textit{Anolis} lizards. Tree and data are from Mahler et al. (2010). See main text for additional details.", fig.height=8, out.width = "100%"}
 phylo.heatmap(anoletree,anole.pc_scores,
   standardize=TRUE,fsize=c(0.4,0.7,0.7),pts=FALSE,
   split=c(0.6,0.4),colors=viridisLite::viridis(n=40,
   direction=-1),mar=rep(0.1,4))
 ```
 
-In Figure \@ref(fig:anole-heatmap) we can already begin to discern some of the interesting ecomorphological phenotypic patterns of *Anolis* lizards [@Losos2009-bq]. For instance, the largest species [known as "crown-giants," @Losos2009-bq], that is, those species with the highest values of PC 1, tend to have moderate or low values for PC 2: meaning they have larger lamellae and shorter tails, controlling for their body size. By contrast some of the smallest species (on PC 1) have among the highest values for PC 2 (tail length). These are the "grass-bush" anoles that perch on grass and bushes near the grown, and use their long tails to control body pitch while jumping. We can likewise see that this combination of phenotypic traits (large body size and large lamellae; small body size and long tail) has evolved *independently* in different parts of the phylogenetic tree. Just by visualizing our data and learning this, we're already doing phylogenetic comparative methods. Neat!
+In Figure \@ref(fig:fig22-anole-heatmap) we can already begin to discern some of the interesting ecomorphological phenotypic patterns of *Anolis* lizards [@Losos2009-bq]. For instance, the largest species [known as "crown-giants," @Losos2009-bq], that is, those species with the highest values of PC 1, tend to have moderate or low values for PC 2: meaning they have larger lamellae and shorter tails, controlling for their body size. By contrast some of the smallest species (on PC 1) have among the highest values for PC 2 (tail length). These are the "grass-bush" anoles that perch on grass and bushes near the grown, and use their long tails to control body pitch while jumping. We can likewise see that this combination of phenotypic traits (large body size and large lamellae; small body size and long tail) has evolved *independently* in different parts of the phylogenetic tree. Just by visualizing our data and learning this, we're already doing phylogenetic comparative methods. Neat!
 
 # Relationship of *phytools* to other packages
 
@@ -1297,6 +1277,6 @@ More than a decade has passed since the original and only article describing *ph
 
 The *phytools* R package is free and open source, and can be downloaded from its CRAN ([https://CRAN.R-project.org/package=phytools](https://CRAN.R-project.org/package=phytools)) or GitHub ([https://github.com/liamrevell/phytools](https://github.com/liamrevell/phytools)) pages. More information about the *phytools* package can be obtained from the software documentation pages, my *phytools* blog ([http://blog.phytools.org](http://blog.phytools.org)), or via my recent book with Luke Harmon [@Revell2022-book].
 
-This article was written in Rmarkdown [@Xie2018; @Xie2022; @Allaire2023], and developed with the help of both *bookdown* [@Xie2016; @Xie2023] and the posit Rstudio IDE [@Rstudio2020]. Markdown code and data files necessary to exactly reproduce the analyses of this article are available at [https://github.com/liamrevell/Revell.phytools-v2/](https://github.com/liamrevell/Revell.phytools-v2/) (and folders therein).
+This article was written in Rmarkdown [@Xie2018; @Xie2022; @Allaire2023], and developed with the help of both *bookdown* [@Xie2016; @Xie2023] and the posit Rstudio IDE [@Rstudio2020]. All data used in the analyses of this article are packaged with the *phytools* R library versions on CRAN and GitHub (links above). Markdown code necessary to exactly rebuild the submitted version of this article (including its analyses and figures) are available at [https://github.com/liamrevell/Revell.phytools-v2/](https://github.com/liamrevell/Revell.phytools-v2/) (and folders therein). A previous version of this article was posted to the preprint server *bioRxiv* (doi: 10.1101/2023.03.08.531791).
 
 # References
